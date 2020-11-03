@@ -46,3 +46,8 @@ sysinfo.txt
 
 # Crashlytics generated file
 crashlytics-build.properties
+
+# Photon
+
+Assets/Photon/
+Assets/Photon.meta
