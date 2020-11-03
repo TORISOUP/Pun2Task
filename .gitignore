@@ -51,3 +51,8 @@ crashlytics-build.properties
 
 Assets/Photon/
 Assets/Photon.meta
+
+# Sandbox
+
+Assets/Sandbox/
+Assets/Sandbox.meta
