@@ -12,7 +12,7 @@ namespace Pun2Task.Callbacks
 
         private AsyncReactiveProperty<AsyncUnit> _onConnected;
 
-        public UniTask<AsyncUnit> OnConnectedAsync
+        public UniTask OnConnectedAsync
         {
             get
             {
@@ -40,7 +40,7 @@ namespace Pun2Task.Callbacks
 
         private AsyncReactiveProperty<AsyncUnit> _onLeftRoom;
 
-        public UniTask<AsyncUnit> OnLeftRoomAsync
+        public UniTask OnLeftRoomAsync
         {
             get
             {
@@ -156,7 +156,7 @@ namespace Pun2Task.Callbacks
 
         private AsyncReactiveProperty<AsyncUnit> _onCreatedRoom;
 
-        public UniTask<AsyncUnit> OnCreatedRoomAsync
+        public UniTask OnCreatedRoomAsync
         {
             get
             {
@@ -185,7 +185,7 @@ namespace Pun2Task.Callbacks
 
         private AsyncReactiveProperty<AsyncUnit> _onJoinedLobby;
 
-        public UniTask<AsyncUnit> OnJoinedLobbyAsync
+        public UniTask OnJoinedLobbyAsync
         {
             get
             {
@@ -214,7 +214,7 @@ namespace Pun2Task.Callbacks
 
         private AsyncReactiveProperty<AsyncUnit> _onLeftLobby;
 
-        public UniTask<AsyncUnit> OnLeftLobbyAsync
+        public UniTask OnLeftLobbyAsync
         {
             get
             {
@@ -329,7 +329,7 @@ namespace Pun2Task.Callbacks
 
         private AsyncReactiveProperty<AsyncUnit> _onJoinedRoom;
 
-        public UniTask<AsyncUnit> OnJoinedRoomAsync
+        public UniTask OnJoinedRoomAsync
         {
             get
             {
@@ -475,7 +475,7 @@ namespace Pun2Task.Callbacks
 
         private AsyncReactiveProperty<AsyncUnit> _onConnectedToMaster;
 
-        public UniTask<AsyncUnit> OnConnectedToMasterAsync
+        public UniTask OnConnectedToMasterAsync
         {
             get
             {
@@ -561,15 +561,15 @@ namespace Pun2Task.Callbacks
 
         #region OnFriendListUpdate
 
-        private AsyncReactiveProperty<List<FriendInfo>> _onFriendListUpdate;
+        private AsyncReactiveProperty<IList<FriendInfo>> _onFriendListUpdate;
 
-        public UniTask<List<FriendInfo>> OnFriendListUpdateAsync
+        public UniTask<IList<FriendInfo>> OnFriendListUpdateAsync
         {
             get
             {
                 if (_onFriendListUpdate == null)
                 {
-                    _onFriendListUpdate = new AsyncReactiveProperty<List<FriendInfo>>(default);
+                    _onFriendListUpdate = new AsyncReactiveProperty<IList<FriendInfo>>(default);
                     _onFriendListUpdate.AddTo(this.GetCancellationTokenOnDestroy());
                 }
 
