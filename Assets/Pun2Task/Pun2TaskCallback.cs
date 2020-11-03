@@ -32,15 +32,15 @@ namespace Pun2Task
 
         #region GetOrCreate
 
-        private static PunCallbacks2Task _instance;
+        private static PunCallbacksBridge _instance;
 
-        private static PunCallbacks2Task GetOrCreate()
+        private static PunCallbacksBridge GetOrCreate()
         {
             if (_instance != null) return _instance;
 
             var gameObject = new GameObject {name = "Pun2TaskCallback"};
             Object.DontDestroyOnLoad(gameObject);
-            _instance = gameObject.AddComponent<PunCallbacks2Task>();
+            _instance = gameObject.AddComponent<PunCallbacksBridge>();
             return _instance;
         }
 

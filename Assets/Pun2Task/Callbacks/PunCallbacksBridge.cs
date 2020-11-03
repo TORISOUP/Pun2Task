@@ -6,7 +6,7 @@ using Photon.Realtime;
 
 namespace Pun2Task.Callbacks
 {
-    internal sealed class PunCallbacks2Task : MonoBehaviourPunCallbacks
+    internal sealed class PunCallbacksBridge : MonoBehaviourPunCallbacks
     {
         #region OnConnected
 
@@ -64,22 +64,93 @@ namespace Pun2Task.Callbacks
         }
 
         #endregion
+        
+        #region OnMasterClientSwitched
+
+        private AsyncReactiveProperty<Player> _onMasterClientSwitched;
+
+        public UniTask<Player> OnMasterClientSwitchedAsync
+        {
+            get
+            {
+                if (_onMasterClientSwitched == null)
+                {
+                    _onMasterClientSwitched = new AsyncReactiveProperty<Player>(default);
+                    _onMasterClientSwitched.AddTo(this.GetCancellationTokenOnDestroy());
+                }
+
+                return _onMasterClientSwitched.WaitAsync();
+            }
+        }
 
 
         public override void OnMasterClientSwitched(Player newMasterClient)
         {
-            base.OnMasterClientSwitched(newMasterClient);
+            if (_onMasterClientSwitched != null)
+            {
+                _onMasterClientSwitched.Value = newMasterClient;
+            }
         }
+
+        #endregion
+
+        #region OnCreateRoomFailed
+
+        private AsyncReactiveProperty<(short returnCode, string message)> _onCreateRoomFailed;
+
+        public UniTask<(short returnCode, string message)> OnCreateRoomFailedAsync
+        {
+            get
+            {
+                if (_onCreateRoomFailed == null)
+                {
+                    _onCreateRoomFailed = new AsyncReactiveProperty<(short returnCode, string message)>(default);
+                    _onCreateRoomFailed.AddTo(this.GetCancellationTokenOnDestroy());
+                }
+
+                return _onCreateRoomFailed.WaitAsync();
+            }
+        }
+
 
         public override void OnCreateRoomFailed(short returnCode, string message)
         {
-            base.OnCreateRoomFailed(returnCode, message);
+            if (_onCreateRoomFailed != null)
+            {
+                _onCreateRoomFailed.Value = (returnCode, message);
+            }
         }
+
+        #endregion
+
+        #region OnJoinRoomFailed
+
+        private AsyncReactiveProperty<(short returnCode, string message)> _onJoinRoomFailed;
+
+        public UniTask<(short returnCode, string message)> OnJoinRoomFailedAsync
+        {
+            get
+            {
+                if (_onJoinRoomFailed == null)
+                {
+                    _onJoinRoomFailed = new AsyncReactiveProperty<(short returnCode, string message)>(default);
+                    _onJoinRoomFailed.AddTo(this.GetCancellationTokenOnDestroy());
+                }
+
+                return _onJoinRoomFailed.WaitAsync();
+            }
+        }
+
 
         public override void OnJoinRoomFailed(short returnCode, string message)
         {
-            base.OnJoinRoomFailed(returnCode, message);
+            if (_onJoinRoomFailed != null)
+            {
+                _onJoinRoomFailed.Value = (returnCode, message);
+            }
         }
+
+        #endregion
 
         #region OnCreatedRoom
 
@@ -139,7 +210,6 @@ namespace Pun2Task.Callbacks
 
         #endregion
 
-
         #region OnLeftLobby
 
         private AsyncReactiveProperty<AsyncUnit> _onLeftLobby;
@@ -197,8 +267,7 @@ namespace Pun2Task.Callbacks
         }
 
         #endregion
-
-
+        
         #region OnRegionListReceived
 
         private AsyncReactiveProperty<RegionHandler> _onRegionListReceived;
@@ -226,7 +295,6 @@ namespace Pun2Task.Callbacks
         }
 
         #endregion
-
 
         #region OnRoomListUpdate
 
@@ -256,7 +324,6 @@ namespace Pun2Task.Callbacks
         }
 
         #endregion
-
 
         #region OnJoinedRoom
 
@@ -331,7 +398,6 @@ namespace Pun2Task.Callbacks
 
         #endregion
 
-
         #region OnPlayerLeftRoom
 
         private AsyncReactiveProperty<Player> _onPlayerLeftRoom;
@@ -405,7 +471,6 @@ namespace Pun2Task.Callbacks
 
         #endregion
 
-
         #region OnConnectedToMasterAsync
 
         private AsyncReactiveProperty<AsyncUnit> _onConnectedToMaster;
@@ -434,7 +499,6 @@ namespace Pun2Task.Callbacks
         }
 
         #endregion
-
 
         #region OnRoomPropertiesUpdate
 
@@ -495,7 +559,6 @@ namespace Pun2Task.Callbacks
 
         #endregion
 
-
         #region OnFriendListUpdate
 
         private AsyncReactiveProperty<List<FriendInfo>> _onFriendListUpdate;
@@ -524,7 +587,6 @@ namespace Pun2Task.Callbacks
         }
 
         #endregion
-
 
         #region OnCustomAuthenticationResponse
 
@@ -556,7 +618,6 @@ namespace Pun2Task.Callbacks
 
         #endregion
 
-
         #region OnCustomAuthenticationFailed
 
         private AsyncReactiveProperty<string> _onCustomAuthenticationFailed;
@@ -586,7 +647,6 @@ namespace Pun2Task.Callbacks
 
         #endregion
 
-
         #region OnWebRpcResponse
 
         private AsyncReactiveProperty<OperationResponse> _onWebRpcResponse;
@@ -615,7 +675,6 @@ namespace Pun2Task.Callbacks
         }
 
         #endregion
-
 
         #region OnLobbyStatisticsUpdate
 
