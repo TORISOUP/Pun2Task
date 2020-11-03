@@ -178,6 +178,18 @@ namespace Pun2Task
         }
 
         /// <summary>
+        /// Called when a remote player entered the room. This Player is already added to the playerlist.
+        /// </summary>
+        /// <remarks>
+        /// If your game starts with a certain number of players, this callback can be useful to check the
+        /// Room.playerCount and find out if you can start.
+        /// </remarks>
+        public static IUniTaskAsyncEnumerable<Player> OnPlayerEnteredRoomAsyncEnumerable()
+        {
+            return GetBridge().OnPlayerEnteredRoomAsyncEnumerable;
+        }
+
+        /// <summary>
         /// Called when a remote player left the room or became inactive. Check otherPlayer.IsInactive.
         /// </summary>
         /// <remarks>
@@ -194,6 +206,25 @@ namespace Pun2Task
         {
             return GetBridge().OnPlayerLeftRoomAsync;
         }
+        
+        /// <summary>
+        /// Called when a remote player left the room or became inactive. Check otherPlayer.IsInactive.
+        /// </summary>
+        /// <remarks>
+        /// If another player leaves the room or if the server detects a lost connection, this callback will
+        /// be used to notify your game logic.
+        ///
+        /// Depending on the room's setup, players may become inactive, which means they may return and retake
+        /// their spot in the room. In such cases, the Player stays in the Room.Players dictionary.
+        ///
+        /// If the player is not just inactive, it gets removed from the Room.Players dictionary, before
+        /// the callback is called.
+        /// </remarks>
+        public static IUniTaskAsyncEnumerable<Player> OnPlayerLeftRoomAsyncEnumerable()
+        {
+            return GetBridge().OnPlayerLeftRoomAsyncEnumerable;
+        }
+        
 
         /// <summary>
         /// Called when a previous OpJoinRandom call failed on the server.

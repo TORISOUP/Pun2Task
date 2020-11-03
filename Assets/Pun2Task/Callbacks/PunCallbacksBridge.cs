@@ -416,7 +416,7 @@ namespace Pun2Task.Callbacks
             }
         }
 
-        public IUniTaskAsyncEnumerable<Player> OnPlayerLeftRoomEnumerable
+        public IUniTaskAsyncEnumerable<Player> OnPlayerLeftRoomAsyncEnumerable
         {
             get
             {
