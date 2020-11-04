@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Photon.Pun;
@@ -39,6 +40,8 @@ namespace Pun2Task
         ///  </remarks>
         public static async UniTask ConnectUsingSettingsAsync(CancellationToken token = default)
         {
+            if (PhotonNetwork.IsConnected) return;
+
             var task = UniTask.WhenAny(
                 Pun2TaskCallback.OnConnectedToMasterAsync().AsAsyncUnitUniTask(),
                 Pun2TaskCallback.OnDisconnectedAsync());
@@ -74,6 +77,8 @@ namespace Pun2Task
             string appID,
             CancellationToken token = default)
         {
+            if (PhotonNetwork.IsConnected) return;
+
             var task = UniTask.WhenAny(
                 Pun2TaskCallback.OnConnectedToMasterAsync().AsAsyncUnitUniTask(),
                 Pun2TaskCallback.OnDisconnectedAsync());
@@ -110,6 +115,8 @@ namespace Pun2Task
         /// <returns>If this client is going to connect to cloud server based on ping. Even if true, this does not guarantee a connection but the attempt is being made.</returns>
         public static async UniTask ConnectToBestCloudServerAsync(CancellationToken token = default)
         {
+            if (PhotonNetwork.IsConnected) return;
+
             var task = UniTask.WhenAny(
                 Pun2TaskCallback.OnConnectedToMasterAsync().AsAsyncUnitUniTask(),
                 Pun2TaskCallback.OnDisconnectedAsync());
@@ -139,6 +146,8 @@ namespace Pun2Task
         /// </remarks>
         public static async UniTask ConnectToRegionAsync(string region, CancellationToken token = default)
         {
+            if (PhotonNetwork.IsConnected) return;
+
             var task = UniTask.WhenAny(
                 Pun2TaskCallback.OnConnectedToMasterAsync().AsAsyncUnitUniTask(),
                 Pun2TaskCallback.OnDisconnectedAsync());
@@ -176,6 +185,8 @@ namespace Pun2Task
         /// </remarks>
         public static async UniTask ReconnectAsync(CancellationToken token = default)
         {
+            if (PhotonNetwork.IsConnected) return;
+
             var task = UniTask.WhenAny(
                 Pun2TaskCallback.OnConnectedToMasterAsync().AsAsyncUnitUniTask(),
                 Pun2TaskCallback.OnDisconnectedAsync());
@@ -235,7 +246,257 @@ namespace Pun2Task
             throw new FailedToCreateRoomException(returnCode, message);
         }
 
+
+        /// <summary>
+        /// Joins a specific room by name and creates it on demand. Will callback: OnJoinedRoom or OnJoinRoomFailed.
+        /// </summary>
+        /// <remarks>
+        /// Useful when players make up a room name to meet in:
+        /// All involved clients call the same method and whoever is first, also creates the room.
+        ///
+        /// When successful, the client will enter the specified room.
+        /// The client which creates the room, will callback both OnCreatedRoom and OnJoinedRoom.
+        /// Clients that join an existing room will only callback OnJoinedRoom.
+        /// In all error cases, OnJoinRoomFailed gets called.
+        ///
+        /// Joining a room will fail, if the room is full, closed or when the user
+        /// already is present in the room (checked by userId).
+        ///
+        /// To return to a room, use OpRejoinRoom.
+        ///
+        /// This method can only be called while the client is connected to a Master Server so you should
+        /// implement the callback OnConnectedToMaster.
+        /// Check the return value to make sure the operation will be called on the server.
+        /// Note: There will be no callbacks if this method returned false.
+        ///
+        ///
+        /// If you set room properties in roomOptions, they get ignored when the room is existing already.
+        /// This avoids changing the room properties by late joining players.
+        ///
+        /// You can define an array of expectedUsers, to block player slots in the room for these users.
+        /// The corresponding feature in Photon is called "Slot Reservation" and can be found in the doc pages.
+        ///
+        ///
+        /// More about PUN matchmaking:
+        /// https://doc.photonengine.com/en-us/pun/v2/lobby-and-matchmaking/matchmaking-and-lobby
+        /// </remarks>
+        /// <param name="roomName">Name of the room to join. Must be non null.</param>
+        /// <param name="roomOptions">Options for the room, in case it does not exist yet. Else these values are ignored.</param>
+        /// <param name="typedLobby">Lobby you want a new room to be listed in. Ignored if the room was existing and got joined.</param>
+        /// <param name="expectedUsers">Optional list of users (by UserId) who are expected to join this game and who you want to block a slot for.</param>
+        /// <returns>True will be returned when you are the first user.</returns>>
+        public static async UniTask<bool> JoinOrCreateRoomAsync(
+            string roomName,
+            RoomOptions roomOptions,
+            TypedLobby typedLobby,
+            string[] expectedUsers = null,
+            CancellationToken token = default)
+        {
+            var createdRoomTask = Pun2TaskCallback.OnCreatedRoomAsync().GetAwaiter();
+            var task = UniTask.WhenAny(
+                Pun2TaskCallback.OnJoinedRoomAsync().AsAsyncUnitUniTask(),
+                Pun2TaskCallback.OnCreateRoomFailedAsync());
+
+            var valid = PhotonNetwork.JoinOrCreateRoom(roomName, roomOptions, typedLobby, expectedUsers);
+            if (!valid) throw new InvalidRoomOperationException("It is not ready to join a room.");
+
+            var (winIndex, _, (returnCode, message)) = await task.WithCancellation(token);
+            if (winIndex == 0) return createdRoomTask.IsCompleted;
+            throw new FailedToCreateRoomException(returnCode, message);
+        }
+
+        /// <summary>
+        /// Joins a room by name. Will callback: OnJoinedRoom or OnJoinRoomFailed.
+        /// </summary>
+        /// <remarks>
+        /// Useful when using lobbies or when players follow friends or invite each other.
+        ///
+        /// When successful, the client will enter the specified room and callback via OnJoinedRoom.
+        /// In all error cases, OnJoinRoomFailed gets called.
+        ///
+        /// Joining a room will fail if the room is full, closed, not existing or when the user
+        /// already is present in the room (checked by userId).
+        ///
+        /// To return to a room, use OpRejoinRoom.
+        /// When players invite each other and it's unclear who's first to respond, use OpJoinOrCreateRoom instead.
+        ///
+        /// This method can only be called while the client is connected to a Master Server so you should
+        /// implement the callback OnConnectedToMaster.
+        /// Check the return value to make sure the operation will be called on the server.
+        /// Note: There will be no callbacks if this method returned false.
+        ///
+        ///
+        /// More about PUN matchmaking:
+        /// https://doc.photonengine.com/en-us/pun/v2/lobby-and-matchmaking/matchmaking-and-lobby
+        /// </remarks>
+        /// <see cref="OnJoinRoomFailed"/>
+        /// <see cref="OnJoinedRoom"/>
+        /// <param name="roomName">Unique name of the room to join.</param>
+        /// <param name="expectedUsers">Optional list of users (by UserId) who are expected to join this game and who you want to block a slot for.</param>
+        public static async UniTask JoinRoomAsync(string roomName, string[] expectedUsers = null,
+            CancellationToken token = default)
+        {
+            var task = UniTask.WhenAny(
+                Pun2TaskCallback.OnJoinedRoomAsync().AsAsyncUnitUniTask(),
+                Pun2TaskCallback.OnCreateRoomFailedAsync());
+
+            var valid = PhotonNetwork.JoinRoom(roomName, expectedUsers);
+            if (!valid) throw new InvalidRoomOperationException("It is not ready to join a room.");
+
+            var (winIndex, _, (returnCode, message)) = await task.WithCancellation(token);
+            if (winIndex == 0) return;
+            throw new FailedToCreateRoomException(returnCode, message);
+        }
+
+
+        /// <summary>
+        /// Rejoins a room by roomName (using the userID internally to return).  Will callback: OnJoinedRoom or OnJoinRoomFailed.
+        /// </summary>
+        /// <remarks>
+        /// After losing connection, you might be able to return to a room and continue playing,
+        /// if the client is reconnecting fast enough. Use Reconnect() and this method.
+        /// Cache the room name you're in and use RejoinRoom(roomname) to return to a game.
+        ///
+        /// Note: To be able to Rejoin any room, you need to use UserIDs!
+        /// You also need to set RoomOptions.PlayerTtl.
+        ///
+        /// <b>Important: Instantiate() and use of RPCs is not yet supported.</b>
+        /// The ownership rules of PhotonViews prevent a seamless return to a game, if you use PhotonViews.
+        /// Use Custom Properties and RaiseEvent with event caching instead.
+        ///
+        /// Common use case: Press the Lock Button on a iOS device and you get disconnected immediately.
+        ///
+        /// Rejoining room will not send any player properties. Instead client will receive up-to-date ones from server.
+        /// If you want to set new player properties, do it once rejoined.
+        public static async UniTask RejoinRoomAsync(string roomName, CancellationToken token = default)
+        {
+            var task = UniTask.WhenAny(
+                Pun2TaskCallback.OnJoinedRoomAsync().AsAsyncUnitUniTask(),
+                Pun2TaskCallback.OnCreateRoomFailedAsync());
+
+            var valid = PhotonNetwork.RejoinRoom(roomName);
+            if (!valid) throw new InvalidRoomOperationException("It is not ready to join a room.");
+
+            var (winIndex, _, (returnCode, message)) = await task.WithCancellation(token);
+            if (winIndex == 0) return;
+            throw new FailedToCreateRoomException(returnCode, message);
+        }
+
+        /// <summary>When the client lost connection during gameplay, this method attempts to reconnect and rejoin the room.</summary>
+        /// <remarks>
+        /// This method re-connects directly to the game server which was hosting the room PUN was in before.
+        /// If the room was shut down in the meantime, PUN will call OnJoinRoomFailed and return this client to the Master Server.
+        ///
+        /// Check the return value, if this client will attempt a reconnect and rejoin (if the conditions are met).
+        /// If ReconnectAndRejoin returns false, you can still attempt a Reconnect and Rejoin.
+        ///
+        /// Similar to PhotonNetwork.RejoinRoom, this requires you to use unique IDs per player (the UserID).
+        ///
+        /// Rejoining room will not send any player properties. Instead client will receive up-to-date ones from server.
+        /// If you want to set new player properties, do it once rejoined.
+        /// </remarks>
+        /// <returns>False, if there is no known room or game server to return to. Then, this client does not attempt the ReconnectAndRejoin.</returns>
+        public static async UniTask ReconnectAndRejoinAsync(CancellationToken token)
+        {
+            var task = UniTask.WhenAny(
+                Pun2TaskCallback.OnJoinedRoomAsync().AsAsyncUnitUniTask(),
+                Pun2TaskCallback.OnCreateRoomFailedAsync());
+
+            var valid = PhotonNetwork.ReconnectAndRejoin();
+            if (!valid) throw new InvalidRoomOperationException("It is not ready to join a room.");
+
+            var (winIndex, _, (returnCode, message)) = await task.WithCancellation(token);
+            if (winIndex == 0) return;
+            throw new FailedToCreateRoomException(returnCode, message);
+        }
+
+        /// <summary>Leave the current room and return to the Master Server where you can join or create rooms (see remarks).</summary>
+        /// <remarks>
+        /// This will clean up all (network) GameObjects with a PhotonView, unless you changed autoCleanUp to false.
+        /// Returns to the Master Server.
+        ///
+        /// In OfflineMode, the local "fake" room gets cleaned up and OnLeftRoom gets called immediately.
+        ///
+        /// In a room with playerTTL &lt; 0, LeaveRoom just turns a client inactive. The player stays in the room's player list
+        /// and can return later on. Setting becomeInactive to false deliberately, means to "abandon" the room, despite the
+        /// playerTTL allowing you to come back.
+        ///
+        /// In a room with playerTTL == 0, become inactive has no effect (clients are removed from the room right away).
+        /// </remarks>
+        /// <param name="becomeInactive">If this client becomes inactive in a room with playerTTL &lt; 0. Defaults to true.</param>
+        public static async UniTask LeaveRoomAsync(bool becomeInactive = true)
+        {
+            if (!PhotonNetwork.InRoom) return;
+            PhotonNetwork.LeaveRoom(becomeInactive);
+            await Pun2TaskCallback.OnLeftRoomAsync();
+        }
+
+        /// <summary>On MasterServer this joins the default lobby which list rooms currently in use.</summary>
+        /// <remarks>
+        /// The room list is sent and refreshed by the server using <see cref="ILobbyCallbacks.OnRoomListUpdate"/>.
+        ///
+        /// Per room you should check if it's full or not before joining. Photon also lists rooms that are
+        /// full, unless you close and hide them (room.open = false and room.visible = false).
+        ///
+        /// In best case, you make your clients join random games, as described here:
+        /// https://doc.photonengine.com/en-us/pun/v2/lobby-and-matchmaking/matchmaking-and-lobby
+        ///
+        ///
+        /// You can show your current players and room count without joining a lobby (but you must
+        /// be on the master server). Use: CountOfPlayers, CountOfPlayersOnMaster, CountOfPlayersInRooms and
+        /// CountOfRooms.
+        ///
+        /// You can use more than one lobby to keep the room lists shorter. See JoinLobby(TypedLobby lobby).
+        /// When creating new rooms, they will be "attached" to the currently used lobby or the default lobby.
+        ///
+        /// You can use JoinRandomRoom without being in a lobby!
+        /// </remarks>
+        public static async UniTask JoinLobbyAsync(TypedLobby typedLobby = null, CancellationToken token = default)
+        {
+            PhotonNetwork.JoinLobby(typedLobby);
+            await Pun2TaskCallback.OnJoinedLobbyAsync().WithCancellation(token);
+        }
+
+        /// <summary>Leave a lobby to stop getting updates about available rooms.</summary>
+        /// <remarks>
+        /// This does not reset PhotonNetwork.lobby! This allows you to join this particular lobby later
+        /// easily.
+        ///
+        /// The values CountOfPlayers, CountOfPlayersOnMaster, CountOfPlayersInRooms and CountOfRooms
+        /// are received even without being in a lobby.
+        ///
+        /// You can use JoinRandomRoom without being in a lobby.
+        /// </remarks>
+        public static async UniTask LeaveLobbyAsync(CancellationToken token = default)
+        {
+            if (PhotonNetwork.LeaveLobby())
+            {
+                await Pun2TaskCallback.OnLeftLobbyAsync().WithCancellation(token);
+            }
+        }
+
         #endregion
+
+        /// <summary>Fetches a custom list of games from the server, matching a SQL-like "where" clause, then triggers OnRoomListUpdate callback.</summary>
+        /// <remarks>
+        /// Operation is only available for lobbies of type SqlLobby.
+        /// This is an async request.
+        ///
+        /// Note: You don't have to join a lobby to query it. Rooms need to be "attached" to a lobby, which can be done
+        /// via the typedLobby parameter in CreateRoom, JoinOrCreateRoom, etc..
+        ///
+        /// When done, OnRoomListUpdate gets called.
+        /// </remarks>
+        /// <see cref="https://doc.photonengine.com/en-us/pun/v2/lobby-and-matchmaking/matchmaking-and-lobby/#sql_lobby_type"/>
+        /// <param name="typedLobby">The lobby to query. Has to be of type SqlLobby.</param>
+        /// <param name="sqlLobbyFilter">The sql query statement.</param>
+        public static async UniTask<IList<RoomInfo>> GetCustomRoomListAsync(TypedLobby typedLobby,
+            string sqlLobbyFilter,
+            CancellationToken token = default)
+        {
+            PhotonNetwork.GetCustomRoomList(typedLobby, sqlLobbyFilter);
+            return await Pun2TaskCallback.OnRoomListUpdateAsync().WithCancellation(token);
+        }
 
         #region Exceptions
 
