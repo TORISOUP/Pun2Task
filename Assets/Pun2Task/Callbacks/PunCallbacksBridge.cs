@@ -1,3 +1,4 @@
+#if PUN_TO_UNITASK_SUPPORT
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using ExitGames.Client.Photon;
@@ -64,7 +65,7 @@ namespace Pun2Task.Callbacks
         }
 
         #endregion
-        
+
         #region OnMasterClientSwitched
 
         private AsyncReactiveProperty<Player> _onMasterClientSwitched;
@@ -267,7 +268,7 @@ namespace Pun2Task.Callbacks
         }
 
         #endregion
-        
+
         #region OnRegionListReceived
 
         private AsyncReactiveProperty<RegionHandler> _onRegionListReceived;
@@ -734,3 +735,4 @@ namespace Pun2Task.Callbacks
         #endregion
     }
 }
+#endif

@@ -1,3 +1,5 @@
+#if PUN_TO_UNITASK_SUPPORT
+
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -541,3 +543,4 @@ namespace Pun2Task
         #endregion
     }
 }
+#endif

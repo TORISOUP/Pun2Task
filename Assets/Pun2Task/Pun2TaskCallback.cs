@@ -1,3 +1,5 @@
+#if PUN_TO_UNITASK_SUPPORT
+
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using ExitGames.Client.Photon;
@@ -374,3 +376,4 @@ namespace Pun2Task
         #endregion
     }
 }
+#endif

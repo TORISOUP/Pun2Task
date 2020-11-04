@@ -1,3 +1,5 @@
+#if PUN_TO_UNITASK_SUPPORT
+
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Linq;
@@ -116,3 +118,5 @@ namespace Pun2Task
         }
     }
 }
+
+#endif
