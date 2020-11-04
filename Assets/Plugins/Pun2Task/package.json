@@ -1,0 +1,21 @@
+{
+    "name": "net.torisoup.pun2task",
+    "displayName": "Pun2Task",
+    "version": "0.1.0",
+    "unity": "2018.4",
+    "description": "Provides async/await support for PUN2 ",
+    "keywords": [ "Photon", "PUN", "async/await", "async", "Task", "UniTask" ],
+    "license": "MIT",
+    "category": "Photon",
+    "dependencies": {
+        "com.cysharp.unitask": "2.0.36"
+    },
+    "author": {
+        "name": "TORISOUP",
+        "url": "https://github.com/TORISOUP"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/TORISOUP/Pun2Task"
+    }
+}
