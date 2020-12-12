@@ -16,8 +16,35 @@ MIT License.
 
 ### 1. Download
 
-- Release Page
-- ~~UnityPackageManager~~ (準備中/in preparation)
+#### A. Release Page
+
+- [here](https://github.com/TORISOUP/Pun2Task/releases)
+
+#### B. UnityPackageManager
+
+`Packages/manifest.json`に以下を追記。
+
+```
+  "scopedRegistries": [
+    {
+      "name": "package.openupm.com",
+      "url": "https://package.openupm.com",
+      "scopes": [
+        "com.cysharp.unitask",
+        "com.openupm"
+      ]
+    }
+  ]
+```
+
+追記したのちに`Package Manager`の`Add package from git URL...`に以下を追加。
+
+![image](https://user-images.githubusercontent.com/861868/101975816-d7457300-3c82-11eb-9c17-07805e7c3b52.png)
+
+```
+https://github.com/TORISOUP/Pun2Task.git?path=Assets/Plugins/Pun2Task#1.0.0
+```
+
 
 ### 2. Add UniTask
 
