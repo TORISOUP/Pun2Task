@@ -42,7 +42,7 @@ MIT License.
 ![image](https://user-images.githubusercontent.com/861868/101975816-d7457300-3c82-11eb-9c17-07805e7c3b52.png)
 
 ```
-https://github.com/TORISOUP/Pun2Task.git?path=Assets/Plugins/Pun2Task#1.0.0
+https://github.com/TORISOUP/Pun2Task.git?path=Assets/Plugins/Pun2Task#1.0.1
 ```
 
 

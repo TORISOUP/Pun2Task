@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 
@@ -297,14 +298,26 @@ namespace Pun2Task
             var createdRoomTask = Pun2TaskCallback.OnCreatedRoomAsync().GetAwaiter();
             var task = UniTask.WhenAny(
                 Pun2TaskCallback.OnJoinedRoomAsync().AsAsyncUnitUniTask(),
-                Pun2TaskCallback.OnCreateRoomFailedAsync());
+                Pun2TaskCallback.OnCreateRoomFailedAsync(),
+                Pun2TaskCallback.OnJoinRoomFailedAsync());
 
             var valid = PhotonNetwork.JoinOrCreateRoom(roomName, roomOptions, typedLobby, expectedUsers);
             if (!valid) throw new InvalidRoomOperationException("It is not ready to join a room.");
 
-            var (winIndex, _, (returnCode, message)) = await task.WithCancellation(token);
+            var (winIndex,
+                _,
+                (createFailedCode, createFailedMessage),
+                (joinFailedCode, joinFailedMessage)) = await task.WithCancellation(token);
             if (winIndex == 0) return createdRoomTask.IsCompleted;
-            throw new FailedToCreateRoomException(returnCode, message);
+
+            if (winIndex == 1)
+            {
+                throw new FailedToCreateRoomException(createFailedCode, createFailedMessage);
+            }
+            else
+            {
+                throw new FailedToJoinRoomException(createFailedCode, createFailedMessage);
+            }
         }
 
         /// <summary>
@@ -340,16 +353,66 @@ namespace Pun2Task
         {
             var task = UniTask.WhenAny(
                 Pun2TaskCallback.OnJoinedRoomAsync().AsAsyncUnitUniTask(),
-                Pun2TaskCallback.OnCreateRoomFailedAsync());
+                Pun2TaskCallback.OnJoinRoomFailedAsync());
 
             var valid = PhotonNetwork.JoinRoom(roomName, expectedUsers);
             if (!valid) throw new InvalidRoomOperationException("It is not ready to join a room.");
 
             var (winIndex, _, (returnCode, message)) = await task.WithCancellation(token);
             if (winIndex == 0) return;
-            throw new FailedToCreateRoomException(returnCode, message);
+            throw new FailedToJoinRoomException(returnCode, message);
         }
 
+        /// <summary>
+        /// Joins a random room that matches the filter. Will callback: OnJoinedRoom or OnJoinRandomFailed.
+        /// </summary>
+        /// <remarks>
+        /// Used for random matchmaking. You can join any room or one with specific properties defined in opJoinRandomRoomParams.
+        /// 
+        /// This operation fails if no rooms are fitting or available (all full, closed, in another lobby or not visible).
+        /// It may also fail when actually joining the room which was found. Rooms may close, become full or empty anytime.
+        /// 
+        /// This method can only be called while the client is connected to a Master Server so you should
+        /// implement the callback OnConnectedToMaster.
+        /// Check the return value to make sure the operation will be called on the server.
+        /// Note: There will be no callbacks if this method returned false.
+        /// 
+        /// More about PUN matchmaking:
+        /// https://doc.photonengine.com/en-us/pun/v2/lobby-and-matchmaking/matchmaking-and-lobby
+        /// </remarks>
+        /// <param name="expectedCustomRoomProperties">Filters for rooms that match these custom properties (string keys and values). To ignore, pass null.</param>
+        /// <param name="expectedMaxPlayers">Filters for a particular maxplayer setting. Use 0 to accept any maxPlayer value.</param>
+        /// <param name="matchingType">Selects one of the available matchmaking algorithms. See MatchmakingMode enum for options.</param>
+        /// <param name="typedLobby">The lobby in which you want to lookup a room. Pass null, to use the default lobby. This does not join that lobby and neither sets the lobby property.</param>
+        /// <param name="sqlLobbyFilter">A filter-string for SQL-typed lobbies.</param>
+        /// <param name="expectedUsers">Optional list of users (by UserId) who are expected to join this game and who you want to block a slot for.</param>
+        /// <returns>If the operation got queued and will be sent.</returns>
+        public static async UniTask JoinRandomRoomAsync(
+            Hashtable expectedCustomRoomProperties,
+            byte expectedMaxPlayers,
+            MatchmakingMode matchingType,
+            TypedLobby typedLobby,
+            string sqlLobbyFilter,
+            string[] expectedUsers = null,
+            CancellationToken token = default)
+        {
+            var task = UniTask.WhenAny(
+                Pun2TaskCallback.OnJoinedRoomAsync().AsAsyncUnitUniTask(),
+                Pun2TaskCallback.OnJoinRandomFailedAsync());
+
+            var valid = PhotonNetwork.JoinRandomRoom(
+                expectedCustomRoomProperties,
+                expectedMaxPlayers,
+                matchingType,
+                typedLobby,
+                sqlLobbyFilter,
+                expectedUsers);
+            if (!valid) throw new InvalidRoomOperationException("It is not ready to join a room.");
+
+            var (winIndex, _, (returnCode, message)) = await task.WithCancellation(token);
+            if (winIndex == 0) return;
+            throw new FailedToJoinRoomException(returnCode, message);
+        }
 
         /// <summary>
         /// Rejoins a room by roomName (using the userID internally to return).  Will callback: OnJoinedRoom or OnJoinRoomFailed.
@@ -374,14 +437,14 @@ namespace Pun2Task
         {
             var task = UniTask.WhenAny(
                 Pun2TaskCallback.OnJoinedRoomAsync().AsAsyncUnitUniTask(),
-                Pun2TaskCallback.OnCreateRoomFailedAsync());
+                Pun2TaskCallback.OnJoinRoomFailedAsync());
 
             var valid = PhotonNetwork.RejoinRoom(roomName);
             if (!valid) throw new InvalidRoomOperationException("It is not ready to join a room.");
 
             var (winIndex, _, (returnCode, message)) = await task.WithCancellation(token);
             if (winIndex == 0) return;
-            throw new FailedToCreateRoomException(returnCode, message);
+            throw new FailedToJoinRoomException(returnCode, message);
         }
 
         /// <summary>When the client lost connection during gameplay, this method attempts to reconnect and rejoin the room.</summary>
@@ -402,14 +465,14 @@ namespace Pun2Task
         {
             var task = UniTask.WhenAny(
                 Pun2TaskCallback.OnJoinedRoomAsync().AsAsyncUnitUniTask(),
-                Pun2TaskCallback.OnCreateRoomFailedAsync());
+                Pun2TaskCallback.OnJoinRoomFailedAsync());
 
             var valid = PhotonNetwork.ReconnectAndRejoin();
             if (!valid) throw new InvalidRoomOperationException("It is not ready to join a room.");
 
             var (winIndex, _, (returnCode, message)) = await task.WithCancellation(token);
             if (winIndex == 0) return;
-            throw new FailedToCreateRoomException(returnCode, message);
+            throw new FailedToJoinRoomException(returnCode, message);
         }
 
         /// <summary>Leave the current room and return to the Master Server where you can join or create rooms (see remarks).</summary>
@@ -516,6 +579,16 @@ namespace Pun2Task
         {
             public InvalidRoomOperationException(string message) : base(message)
             {
+            }
+        }
+
+        public class FailedToJoinRoomException : Pun2TaskException
+        {
+            public short ReturnCode { get; }
+
+            public FailedToJoinRoomException(short returnCode, string message) : base(message)
+            {
+                ReturnCode = returnCode;
             }
         }
 
