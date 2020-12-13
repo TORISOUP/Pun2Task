@@ -113,6 +113,12 @@ private async UniTaskVoid CreateOrJoinRoomSampleAsync(CancellationToken token)
         // Failed to create a room, etc.
         Debug.LogError(ex);
     }
+    catch (Pun2TaskNetwork.FailedToJoinRoomException ex)
+    {
+        // 部屋に参加できなかった。
+        // Failed to join a room, etc.
+        Debug.LogError(ex);
+    }
 }
 ```
 
