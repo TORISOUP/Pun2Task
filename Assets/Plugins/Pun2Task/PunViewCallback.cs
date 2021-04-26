@@ -17,6 +17,9 @@ namespace Pun2Task
         private readonly AsyncReactiveProperty<(PhotonView targetView, Player previousOwner)> _ownershipTransferedAsync
             = new AsyncReactiveProperty<(PhotonView targetView, Player previousOwner)>(default);
 
+        private readonly AsyncReactiveProperty<(PhotonView targetView, Player senderOfFailedRequest)> _ownershipTransferFailedAsync
+            = new AsyncReactiveProperty<(PhotonView targetView, Player senderOfFailedRequest)>(default);
+
         private readonly AsyncReactiveProperty<bool> _isMine = new AsyncReactiveProperty<bool>(false);
 
         public IUniTaskAsyncEnumerable<(PhotonView targetView, Player requestingPlayer)> OwnershipRequestAsyncEnumerable
@@ -24,6 +27,9 @@ namespace Pun2Task
 
         public IUniTaskAsyncEnumerable<(PhotonView targetView, Player previousOwner)> OwnershipTransferedAsyncEnumerable
             => _ownershipTransferedAsync;
+
+        public IUniTaskAsyncEnumerable<(PhotonView targetView, Player previousOwner)> OwnershipTransferFailedAsyncEnumerable
+            => _ownershipTransferFailedAsync;
 
         public IUniTaskAsyncEnumerable<bool> IsMineAsyncEnumerable => _isMine;
 
@@ -49,6 +55,7 @@ namespace Pun2Task
         {
             _ownershipRequestAsync.Dispose();
             _ownershipTransferedAsync.Dispose();
+            _ownershipTransferFailedAsync.Dispose();
             _isMine.Dispose();
         }
 
@@ -64,6 +71,11 @@ namespace Pun2Task
             {
                 _isMine.Value = _myView.IsMine;
             }
+        }
+
+        public void OnOwnershipTransferFailed(PhotonView targetView, Player senderOfFailedRequest)
+        {
+            _ownershipTransferFailedAsync.Value = (targetView, senderOfFailedRequest);
         }
     }
 
