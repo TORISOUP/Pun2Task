@@ -100,6 +100,15 @@ namespace Pun2Task
         }
 
         /// <summary>
+        /// OnOwnershipTransferFailed
+        /// </summary>
+        public static IUniTaskAsyncEnumerable<(PhotonView targetView, Player previousOwner)>
+            OwnershipTransferFailedAsyncEnumerable(this PhotonView view)
+        {
+            return GetOrAdd(view).OwnershipTransferFailedAsyncEnumerable;
+        }
+        
+        /// <summary>
         /// PhotonView.IsMine
         /// </summary>
         public static IUniTaskAsyncEnumerable<bool> IsMineAsyncEnumerable(this PhotonView view)
