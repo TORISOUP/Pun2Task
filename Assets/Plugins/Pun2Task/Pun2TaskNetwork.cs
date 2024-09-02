@@ -149,7 +149,7 @@ namespace Pun2Task
             if (winIndex == 0) return;
             throw new ConnectionFailedException(disconnectCause);
         }
-        
+
         /// <summary>
         /// PhotonNetwork.Disconnect
         /// </summary>
@@ -159,7 +159,7 @@ namespace Pun2Task
             PhotonNetwork.Disconnect();
             await Pun2TaskCallback.OnDisconnectedAsync();
         }
-        
+
         /// <summary>
         /// PhotonNetwork.Reconnect
         /// </summary>
@@ -184,7 +184,7 @@ namespace Pun2Task
         #endregion
 
         #region RoomConnection
-        
+
         /// <summary>
         /// PhotonNetwork.CreateRoom
         /// </summary>
@@ -254,7 +254,7 @@ namespace Pun2Task
                 _ => throw new FailedToJoinRoomException(createFailedCode, createFailedMessage)
             };
         }
-        
+
         /// <summary>
         /// PhotonNetwork.JoinRoom
         /// </summary>
@@ -317,7 +317,7 @@ namespace Pun2Task
             if (winIndex == 0) return;
             throw new FailedToJoinRoomException(returnCode, message);
         }
-        
+
         /// <summary>
         /// PhotonNetwork.RejoinRoom
         /// </summary>
@@ -338,7 +338,7 @@ namespace Pun2Task
             if (winIndex == 0) return;
             throw new FailedToJoinRoomException(returnCode, message);
         }
-        
+
         /// <summary>
         /// PhotonNetwork.ReconnectAndRejoin
         /// </summary>
@@ -358,22 +358,22 @@ namespace Pun2Task
             if (winIndex == 0) return;
             throw new FailedToJoinRoomException(returnCode, message);
         }
-        
+
         /// <summary>
         /// PhotonNetwork.LeaveRoom
         /// </summary>
         /// <param name="becomeInactive"></param>
         /// <exception cref="InvalidRoomOperationException">Throws when PhotonNetwork.LeaveRoom returns false.</exception>
-        public static async UniTask LeaveRoomAsync(bool becomeInactive = true)
+        public static async UniTask LeaveRoomAsync(bool becomeInactive = true, CancellationToken token = default)
         {
             if (!PhotonNetwork.LeaveRoom(becomeInactive))
             {
                 throw new InvalidRoomOperationException("Failed to leave room.");
             }
 
-            await Pun2TaskCallback.OnLeftRoomAsync();
+            await Pun2TaskCallback.OnLeftRoomAsync(token);
         }
-        
+
         /// <summary>
         /// PhotonNetwork.JoinLobby
         /// </summary>
@@ -390,7 +390,7 @@ namespace Pun2Task
 
             await Pun2TaskCallback.OnJoinedLobbyAsync(token);
         }
-        
+
         /// <summary>
         /// PhotonNetwork.LeaveLobby
         /// </summary>
@@ -407,7 +407,7 @@ namespace Pun2Task
         }
 
         #endregion
-        
+
         /// <summary>
         /// PhotonNetwork.GetCustomRoomList
         /// </summary>
