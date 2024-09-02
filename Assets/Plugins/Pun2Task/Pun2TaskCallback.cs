@@ -1,8 +1,10 @@
 #if PUN_TO_UNITASK_SUPPORT
 
 using System.Collections.Generic;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using ExitGames.Client.Photon;
+using Photon.Pun;
 using Photon.Realtime;
 using Pun2Task.Callbacks;
 using UnityEngine;
@@ -25,9 +27,9 @@ namespace Pun2Task
         ///
         /// This is not called for transitions from the masterserver to game servers.
         /// </remarks>
-        public static UniTask OnConnectedAsync()
+        public static UniTask OnConnectedAsync(CancellationToken ct = default)
         {
-            return GetBridge().OnConnectedAsync;
+            return GetBridge().GetOnConnectedAsync(ct);
         }
 
         /// <summary>
@@ -39,9 +41,9 @@ namespace Pun2Task
         ///
         /// Wait for the callback OnConnectedToMaster, before you use lobbies and join or create rooms.
         /// </remarks>
-        public static UniTask OnLeftRoomAsync()
+        public static UniTask OnLeftRoomAsync(CancellationToken ct = default)
         {
-            return GetBridge().OnLeftRoomAsync;
+            return GetBridge().GetOnLeftRoomAsync(ct);
         }
 
         /// <summary>
@@ -51,9 +53,9 @@ namespace Pun2Task
         /// This is not called when this client enters a room.
         /// The former MasterClient is still in the player list when this method get called.
         /// </remarks>
-        public static UniTask<Player> OnMasterClientSwitchedAsync()
+        public static UniTask<Player> OnMasterClientSwitchedAsync(CancellationToken ct = default)
         {
-            return GetBridge().OnMasterClientSwitchedAsync;
+            return GetBridge().GetOnMasterClientSwitchedAsync(ct);
         }
 
         /// <summary>
@@ -62,9 +64,9 @@ namespace Pun2Task
         /// <remarks>
         /// The most common cause to fail creating a room, is when a title relies on fixed room-names and the room already exists.
         /// </remarks>
-        public static UniTask<(short returnCode, string message)> OnCreateRoomFailedAsync()
+        public static UniTask<(short returnCode, string message)> OnCreateRoomFailedAsync(CancellationToken ct = default)
         {
-            return GetBridge().OnCreateRoomFailedAsync;
+            return GetBridge().GetOnCreateRoomFailedAsync(ct);
         }
 
         /// <summary>
@@ -73,9 +75,9 @@ namespace Pun2Task
         /// <remarks>
         /// The most common causes are that a room is full or does not exist (due to someone else being faster or closing the room).
         /// </remarks>
-        public static UniTask<(short returnCode, string message)> OnJoinRoomFailedAsync()
+        public static UniTask<(short returnCode, string message)> OnJoinRoomFailedAsync(CancellationToken ct = default)
         {
-            return GetBridge().OnJoinRoomFailedAsync;
+            return GetBridge().GetOnJoinRoomFailedAsync(ct);
         }
 
         /// <summary>
@@ -90,9 +92,9 @@ namespace Pun2Task
         /// If you need specific room properties or a "start signal", implement OnMasterClientSwitched()
         /// and make each new MasterClient check the room's state.
         /// </remarks>
-        public static UniTask OnCreatedRoomAsync()
+        public static UniTask OnCreatedRoomAsync(CancellationToken ct = default)
         {
-            return GetBridge().OnCreatedRoomAsync;
+            return GetBridge().GetOnCreatedRoomAsync(ct);
         }
 
         /// <summary>
@@ -102,9 +104,9 @@ namespace Pun2Task
         /// While in the lobby, the roomlist is automatically updated in fixed intervals (which you can't modify in the public cloud).
         /// The room list gets available via OnRoomListUpdate.
         /// </remarks>
-        public static UniTask OnJoinedLobbyAsync()
+        public static UniTask OnJoinedLobbyAsync(CancellationToken ct = default)
         {
-            return GetBridge().OnJoinedLobbyAsync;
+            return GetBridge().GetOnJoinedLobbyAsync(ct);
         }
 
         /// <summary>
@@ -114,9 +116,9 @@ namespace Pun2Task
         /// When you leave a lobby, [OpCreateRoom](@ref OpCreateRoom) and [OpJoinRandomRoom](@ref OpJoinRandomRoom)
         /// automatically refer to the default lobby.
         /// </remarks>
-        public static UniTask OnLeftLobbyAsync()
+        public static UniTask OnLeftLobbyAsync(CancellationToken ct = default)
         {
-            return GetBridge().OnLeftLobbyAsync;
+            return GetBridge().GetOnLeftLobbyAsync(ct);
         }
 
         /// <summary>
@@ -125,9 +127,9 @@ namespace Pun2Task
         /// <remarks>
         /// The reason for this disconnect is provided as DisconnectCause.
         /// </remarks>
-        public static UniTask<DisconnectCause> OnDisconnectedAsync()
+        public static UniTask<DisconnectCause> OnDisconnectedAsync(CancellationToken ct = default)
         {
-            return GetBridge().OnDisconnectedAsync;
+            return GetBridge().GetOnDisconnectedAsync(ct);
         }
 
 
@@ -135,9 +137,9 @@ namespace Pun2Task
         /// Called when the Name Server provided a list of regions for your title.
         /// </summary>
         /// <remarks>Check the RegionHandler class description, to make use of the provided values.</remarks>
-        public static UniTask<RegionHandler> OnRegionListReceivedAsync()
+        public static UniTask<RegionHandler> OnRegionListReceivedAsync(CancellationToken ct = default)
         {
-            return GetBridge().OnRegionListReceivedAsync;
+            return GetBridge().GetOnRegionListReceivedAsync(ct);
         }
 
         /// <summary>
@@ -147,9 +149,9 @@ namespace Pun2Task
         /// Each item is a RoomInfo which might include custom properties (provided you defined those as lobby-listed when creating a room).
         /// Not all types of lobbies provide a listing of rooms to the client. Some are silent and specialized for server-side matchmaking.
         /// </remarks>
-        public static UniTask<IList<RoomInfo>> OnRoomListUpdateAsync()
+        public static UniTask<IList<RoomInfo>> OnRoomListUpdateAsync(CancellationToken ct = default)
         {
-            return GetBridge().OnRoomListUpdateAsync;
+            return GetBridge().GetOnRoomListUpdateAsync(ct);
         }
 
         /// <summary>
@@ -162,9 +164,9 @@ namespace Pun2Task
         ///
         /// If you want a match to be started "actively", enable the user to signal "ready" (using OpRaiseEvent or a Custom Property).
         /// </remarks>
-        public static UniTask OnJoinedRoomAsync()
+        public static UniTask OnJoinedRoomAsync(CancellationToken ct = default)
         {
-            return GetBridge().OnJoinedRoomAsync;
+            return GetBridge().GetOnJoinedRoomAsync(ct);
         }
 
         /// <summary>
@@ -174,9 +176,9 @@ namespace Pun2Task
         /// If your game starts with a certain number of players, this callback can be useful to check the
         /// Room.playerCount and find out if you can start.
         /// </remarks>
-        public static UniTask<Player> OnPlayerEnteredRoomAsync()
+        public static UniTask<Player> OnPlayerEnteredRoomAsync(CancellationToken ct = default)
         {
-            return GetBridge().OnPlayerEnteredRoomAsync;
+            return GetBridge().GetOnPlayerEnteredRoomAsync(ct);
         }
 
         /// <summary>
@@ -204,11 +206,11 @@ namespace Pun2Task
         /// If the player is not just inactive, it gets removed from the Room.Players dictionary, before
         /// the callback is called.
         /// </remarks>
-        public static UniTask<Player> OnPlayerLeftRoomAsync()
+        public static UniTask<Player> OnPlayerLeftRoomAsync(CancellationToken ct = default)
         {
-            return GetBridge().OnPlayerLeftRoomAsync;
+            return GetBridge().GetOnPlayerLeftRoomAsync(ct);
         }
-        
+
         /// <summary>
         /// Called when a remote player left the room or became inactive. Check otherPlayer.IsInactive.
         /// </summary>
@@ -226,7 +228,7 @@ namespace Pun2Task
         {
             return GetBridge().OnPlayerLeftRoomAsyncEnumerable;
         }
-        
+
 
         /// <summary>
         /// Called when a previous OpJoinRandom call failed on the server.
@@ -236,9 +238,9 @@ namespace Pun2Task
         ///
         /// When using multiple lobbies (via OpJoinLobby or a TypedLobby parameter), another lobby might have more/fitting rooms.<br/>
         /// </remarks>
-        public static UniTask<(short returnCode, string message)> OnJoinRandomFailedAsync()
+        public static UniTask<(short returnCode, string message)> OnJoinRandomFailedAsync(CancellationToken ct = default)
         {
-            return GetBridge().OnJoinRandomFailedAsync;
+            return GetBridge().GetOnJoinRandomFailedAsync(ct);
         }
 
         /// <summary>
@@ -248,9 +250,10 @@ namespace Pun2Task
         /// The list of available rooms won't become available unless you join a lobby via LoadBalancingClient.OpJoinLobby.
         /// You can join rooms and create them even without being in a lobby. The default lobby is used in that case.
         /// </remarks>
-        public static UniTask OnConnectedToMasterAsync()
+        public static async UniTask OnConnectedToMasterAsync(CancellationToken ct = default)
         {
-            return GetBridge().OnConnectedToMasterAsync;
+            if (PhotonNetwork.NetworkClientState == ClientState.ConnectedToMasterServer) return;
+            await GetBridge().GetOnConnectedToMasterAsync(ct);
         }
 
         /// <summary>
@@ -260,9 +263,9 @@ namespace Pun2Task
         /// Since v1.25 this method has one parameter: Hashtable propertiesThatChanged.<br/>
         /// Changing properties must be done by Room.SetCustomProperties, which causes this callback locally, too.
         /// </remarks>
-        public static UniTask<Hashtable> OnRoomPropertiesUpdateAsync()
+        public static UniTask<Hashtable> OnRoomPropertiesUpdateAsync(CancellationToken ct = default)
         {
-            return GetBridge().OnRoomPropertiesUpdateAsync;
+            return GetBridge().GetOnRoomPropertiesUpdateAsync(ct);
         }
 
         /// <summary>
@@ -271,9 +274,9 @@ namespace Pun2Task
         /// <remarks>
         /// Changing properties must be done by Player.SetCustomProperties, which causes this callback locally, too.
         /// </remarks>
-        public static UniTask<(Player targetPlayer, Hashtable changedProps)> OnPlayerPropertiesUpdateAsync()
+        public static UniTask<(Player targetPlayer, Hashtable changedProps)> OnPlayerPropertiesUpdateAsync(CancellationToken ct = default)
         {
-            return GetBridge().OnPlayerPropertiesUpdateAsync;
+            return GetBridge().GetOnPlayerPropertiesUpdateAsync(ct);
         }
 
         /// <summary>
@@ -285,9 +288,9 @@ namespace Pun2Task
         ///
         /// Use the friendList to update your UI and store it, if the UI should highlight changes.
         /// </remarks>
-        public static UniTask<IList<FriendInfo>> OnFriendListUpdateAsync()
+        public static UniTask<IList<FriendInfo>> OnFriendListUpdateAsync(CancellationToken ct = default)
         {
-            return GetBridge().OnFriendListUpdateAsync;
+            return GetBridge().GetOnFriendListUpdateAsync(ct);
         }
 
         /// <summary>
@@ -302,9 +305,9 @@ namespace Pun2Task
         /// Example: void OnCustomAuthenticationResponse(Dictionary&lt;string, object&gt; data) { ... }
         /// </remarks>
         /// <see cref="https://doc.photonengine.com/en-us/realtime/current/reference/custom-authentication"/>
-        public static UniTask<IReadOnlyDictionary<string, object>> OnCustomAuthenticationResponseAsync()
+        public static UniTask<IReadOnlyDictionary<string, object>> OnCustomAuthenticationResponseAsync(CancellationToken ct = default)
         {
-            return GetBridge().OnCustomAuthenticationResponseAsync;
+            return GetBridge().GetOnCustomAuthenticationResponseAsync(ct);
         }
 
         /// <summary>
@@ -320,23 +323,23 @@ namespace Pun2Task
         /// Unless you setup a custom authentication service for your app (in the [Dashboard](https://dashboard.photonengine.com)),
         /// this won't be called!
         /// </remarks>
-        public static UniTask<string> OnCustomAuthenticationFailedAsync()
+        public static UniTask<string> OnCustomAuthenticationFailedAsync(CancellationToken ct = default)
         {
-            return GetBridge().OnCustomAuthenticationFailedAsync;
+            return GetBridge().GetOnCustomAuthenticationFailedAsync(ct);
         }
 
         //TODO: Check if this needs to be implemented
         // in: IOptionalInfoCallbacks
-        public static UniTask<OperationResponse> OnWebRpcResponseAsync()
+        public static UniTask<OperationResponse> OnWebRpcResponseAsync(CancellationToken ct = default)
         {
-            return GetBridge().OnWebRpcResponseAsync;
+            return GetBridge().GetOnWebRpcResponseAsync(ct);
         }
 
         //TODO: Check if this needs to be implemented
         // in: IOptionalInfoCallbacks
-        public static UniTask<IList<TypedLobbyInfo>> OnLobbyStatisticsUpdateAsync()
+        public static UniTask<IList<TypedLobbyInfo>> OnLobbyStatisticsUpdateAsync(CancellationToken ct = default)
         {
-            return GetBridge().OnLobbyStatisticsUpdateAsync;
+            return GetBridge().GetOnLobbyStatisticsUpdateAsync(ct);
         }
 
         /// <summary>
@@ -353,9 +356,9 @@ namespace Pun2Task
         /// read more here: https://doc.photonengine.com/en-us/realtime/current/gameplay/cached-events#special_considerations
         /// </remarks>
         /// <param name="errorInfo">object containing information about the error</param>
-        public static UniTask<ErrorInfo> OnErrorInfoAsync()
+        public static UniTask<ErrorInfo> OnErrorInfoAsync(CancellationToken ct = default)
         {
-            return GetBridge().OnErrorInfoAsync;
+            return GetBridge().GetOnErrorInfoAsync(ct);
         }
 
 
@@ -367,7 +370,7 @@ namespace Pun2Task
         {
             if (_instance != null) return _instance;
 
-            var gameObject = new GameObject {name = "Pun2TaskCallback"};
+            var gameObject = new GameObject { name = "Pun2TaskCallback" };
             Object.DontDestroyOnLoad(gameObject);
             _instance = gameObject.AddComponent<PunCallbacksBridge>();
             return _instance;

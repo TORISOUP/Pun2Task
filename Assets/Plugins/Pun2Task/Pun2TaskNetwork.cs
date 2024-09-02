@@ -43,15 +43,16 @@ namespace Pun2Task
         ///  </remarks>
         public static async UniTask ConnectUsingSettingsAsync(CancellationToken token = default)
         {
-            if (PhotonNetwork.IsConnected) return;
-
             var task = UniTask.WhenAny(
-                Pun2TaskCallback.OnConnectedToMasterAsync().AsAsyncUnitUniTask(),
-                Pun2TaskCallback.OnDisconnectedAsync());
+                Pun2TaskCallback.OnConnectedToMasterAsync(token).AsAsyncUnitUniTask(),
+                Pun2TaskCallback.OnDisconnectedAsync(token));
 
-            PhotonNetwork.ConnectUsingSettings();
+            var result = PhotonNetwork.ConnectUsingSettings();
+            if (!result)
+                throw new InvalidNetworkOperationException(nameof(ConnectUsingSettingsAsync) +
+                                                           " is not ready to connect.");
 
-            var (winIndex, _, disconnectCause) = await task.AttachExternalCancellation(token);
+            var (winIndex, _, disconnectCause) = await task;
 
             if (winIndex == 0) return;
             throw new ConnectionFailedException(disconnectCause);
@@ -63,12 +64,15 @@ namespace Pun2Task
             CancellationToken token = default)
         {
             var task = UniTask.WhenAny(
-                Pun2TaskCallback.OnConnectedToMasterAsync().AsAsyncUnitUniTask(),
-                Pun2TaskCallback.OnDisconnectedAsync());
+                Pun2TaskCallback.OnConnectedToMasterAsync(token).AsAsyncUnitUniTask(),
+                Pun2TaskCallback.OnDisconnectedAsync(token));
 
-            PhotonNetwork.ConnectUsingSettings(appSettings, startInOfflineMode);
+            var result = PhotonNetwork.ConnectUsingSettings(appSettings, startInOfflineMode);
+            if (!result)
+                throw new InvalidNetworkOperationException(nameof(ConnectUsingSettingsAsync) +
+                                                           " is not ready to connect.");
 
-            var (winIndex, _, disconnectCause) = await task.AttachExternalCancellation(token);
+            var (winIndex, _, disconnectCause) = await task;
 
             if (winIndex == 0) return;
             throw new ConnectionFailedException(disconnectCause);
@@ -80,15 +84,17 @@ namespace Pun2Task
             string appID,
             CancellationToken token = default)
         {
-            if (PhotonNetwork.IsConnected) return;
-
             var task = UniTask.WhenAny(
-                Pun2TaskCallback.OnConnectedToMasterAsync().AsAsyncUnitUniTask(),
-                Pun2TaskCallback.OnDisconnectedAsync());
+                Pun2TaskCallback.OnConnectedToMasterAsync(token).AsAsyncUnitUniTask(),
+                Pun2TaskCallback.OnDisconnectedAsync(token));
 
-            PhotonNetwork.ConnectToMaster(masterServerAddress, port, appID);
+            var result = PhotonNetwork.ConnectToMaster(masterServerAddress, port, appID);
+            if (!result)
+            {
+                throw new InvalidNetworkOperationException(nameof(ConnectToMasterAsync) + " is not ready to connect.");
+            }
 
-            var (winIndex, _, disconnectCause) = await task.AttachExternalCancellation(token);
+            var (winIndex, _, disconnectCause) = await task;
 
             if (winIndex == 0) return;
             throw new ConnectionFailedException(disconnectCause);
@@ -118,15 +124,18 @@ namespace Pun2Task
         /// <returns>If this client is going to connect to cloud server based on ping. Even if true, this does not guarantee a connection but the attempt is being made.</returns>
         public static async UniTask ConnectToBestCloudServerAsync(CancellationToken token = default)
         {
-            if (PhotonNetwork.IsConnected) return;
-
             var task = UniTask.WhenAny(
-                Pun2TaskCallback.OnConnectedToMasterAsync().AsAsyncUnitUniTask(),
-                Pun2TaskCallback.OnDisconnectedAsync());
+                Pun2TaskCallback.OnConnectedToMasterAsync(token).AsAsyncUnitUniTask(),
+                Pun2TaskCallback.OnDisconnectedAsync(token));
 
-            PhotonNetwork.ConnectToBestCloudServer();
+            var result = PhotonNetwork.ConnectToBestCloudServer();
+            if (!result)
+            {
+                throw new InvalidNetworkOperationException(nameof(ConnectToBestCloudServerAsync) +
+                                                           " is not ready to connect.");
+            }
 
-            var (winIndex, _, disconnectCause) = await task.AttachExternalCancellation(token);
+            var (winIndex, _, disconnectCause) = await task;
 
             if (winIndex == 0) return;
             throw new ConnectionFailedException(disconnectCause);
@@ -149,15 +158,17 @@ namespace Pun2Task
         /// </remarks>
         public static async UniTask ConnectToRegionAsync(string region, CancellationToken token = default)
         {
-            if (PhotonNetwork.IsConnected) return;
-
             var task = UniTask.WhenAny(
-                Pun2TaskCallback.OnConnectedToMasterAsync().AsAsyncUnitUniTask(),
-                Pun2TaskCallback.OnDisconnectedAsync());
+                Pun2TaskCallback.OnConnectedToMasterAsync(token).AsAsyncUnitUniTask(),
+                Pun2TaskCallback.OnDisconnectedAsync(token));
 
-            PhotonNetwork.ConnectToRegion(region);
+            var result = PhotonNetwork.ConnectToRegion(region);
+            if (!result)
+            {
+                throw new InvalidNetworkOperationException(nameof(ConnectToRegionAsync) + " is not ready to connect.");
+            }
 
-            var (winIndex, _, disconnectCause) = await task.AttachExternalCancellation(token);
+            var (winIndex, _, disconnectCause) = await task;
 
             if (winIndex == 0) return;
             throw new ConnectionFailedException(disconnectCause);
@@ -188,15 +199,14 @@ namespace Pun2Task
         /// </remarks>
         public static async UniTask ReconnectAsync(CancellationToken token = default)
         {
-            if (PhotonNetwork.IsConnected) return;
-
             var task = UniTask.WhenAny(
-                Pun2TaskCallback.OnConnectedToMasterAsync().AsAsyncUnitUniTask(),
-                Pun2TaskCallback.OnDisconnectedAsync());
+                Pun2TaskCallback.OnConnectedToMasterAsync(token).AsAsyncUnitUniTask(),
+                Pun2TaskCallback.OnDisconnectedAsync(token));
 
-            PhotonNetwork.Reconnect();
+            var result = PhotonNetwork.Reconnect();
+            if (!result) throw new InvalidNetworkOperationException("It is not ready to reconnect.");
 
-            var (winIndex, _, disconnectCause) = await task.AttachExternalCancellation(token);
+            var (winIndex, _, disconnectCause) = await task;
 
             if (winIndex == 0) return;
             throw new ConnectionFailedException(disconnectCause);
@@ -238,13 +248,13 @@ namespace Pun2Task
             CancellationToken token = default)
         {
             var task = UniTask.WhenAny(
-                Pun2TaskCallback.OnJoinedRoomAsync().AsAsyncUnitUniTask(),
-                Pun2TaskCallback.OnCreateRoomFailedAsync());
+                Pun2TaskCallback.OnJoinedRoomAsync(token).AsAsyncUnitUniTask(),
+                Pun2TaskCallback.OnCreateRoomFailedAsync(token));
 
             var valid = PhotonNetwork.CreateRoom(roomName, roomOptions, typedLobby, expectedUsers);
             if (!valid) throw new InvalidRoomOperationException("It is not ready to create a room.");
 
-            var (winIndex, _, (returnCode, message)) = await task.AttachExternalCancellation(token);
+            var (winIndex, _, (returnCode, message)) = await task;
             if (winIndex == 0) return;
             throw new FailedToCreateRoomException(returnCode, message);
         }
@@ -295,11 +305,11 @@ namespace Pun2Task
             string[] expectedUsers = null,
             CancellationToken token = default)
         {
-            var createdRoomTask = Pun2TaskCallback.OnCreatedRoomAsync().GetAwaiter();
+            var createdRoomTask = Pun2TaskCallback.OnCreatedRoomAsync(token).GetAwaiter();
             var task = UniTask.WhenAny(
-                Pun2TaskCallback.OnJoinedRoomAsync().AsAsyncUnitUniTask(),
-                Pun2TaskCallback.OnCreateRoomFailedAsync(),
-                Pun2TaskCallback.OnJoinRoomFailedAsync());
+                Pun2TaskCallback.OnJoinedRoomAsync(token).AsAsyncUnitUniTask(),
+                Pun2TaskCallback.OnCreateRoomFailedAsync(token),
+                Pun2TaskCallback.OnJoinRoomFailedAsync(token));
 
             var valid = PhotonNetwork.JoinOrCreateRoom(roomName, roomOptions, typedLobby, expectedUsers);
             if (!valid) throw new InvalidRoomOperationException("It is not ready to join a room.");
@@ -307,17 +317,13 @@ namespace Pun2Task
             var (winIndex,
                 _,
                 (createFailedCode, createFailedMessage),
-                (joinFailedCode, joinFailedMessage)) = await task.AttachExternalCancellation(token);
-            if (winIndex == 0) return createdRoomTask.IsCompleted;
-
-            if (winIndex == 1)
+                _) = await task;
+            return winIndex switch
             {
-                throw new FailedToCreateRoomException(createFailedCode, createFailedMessage);
-            }
-            else
-            {
-                throw new FailedToJoinRoomException(createFailedCode, createFailedMessage);
-            }
+                0 => createdRoomTask.IsCompleted,
+                1 => throw new FailedToCreateRoomException(createFailedCode, createFailedMessage),
+                _ => throw new FailedToJoinRoomException(createFailedCode, createFailedMessage)
+            };
         }
 
         /// <summary>
@@ -348,17 +354,18 @@ namespace Pun2Task
         /// <see cref="OnJoinedRoom"/>
         /// <param name="roomName">Unique name of the room to join.</param>
         /// <param name="expectedUsers">Optional list of users (by UserId) who are expected to join this game and who you want to block a slot for.</param>
-        public static async UniTask JoinRoomAsync(string roomName, string[] expectedUsers = null,
+        public static async UniTask JoinRoomAsync(string roomName,
+            string[] expectedUsers = null,
             CancellationToken token = default)
         {
             var task = UniTask.WhenAny(
-                Pun2TaskCallback.OnJoinedRoomAsync().AsAsyncUnitUniTask(),
-                Pun2TaskCallback.OnJoinRoomFailedAsync());
+                Pun2TaskCallback.OnJoinedRoomAsync(token).AsAsyncUnitUniTask(),
+                Pun2TaskCallback.OnJoinRoomFailedAsync(token));
 
             var valid = PhotonNetwork.JoinRoom(roomName, expectedUsers);
             if (!valid) throw new InvalidRoomOperationException("It is not ready to join a room.");
 
-            var (winIndex, _, (returnCode, message)) = await task.AttachExternalCancellation(token);
+            var (winIndex, _, (returnCode, message)) = await task;
             if (winIndex == 0) return;
             throw new FailedToJoinRoomException(returnCode, message);
         }
@@ -397,8 +404,8 @@ namespace Pun2Task
             CancellationToken token = default)
         {
             var task = UniTask.WhenAny(
-                Pun2TaskCallback.OnJoinedRoomAsync().AsAsyncUnitUniTask(),
-                Pun2TaskCallback.OnJoinRandomFailedAsync());
+                Pun2TaskCallback.OnJoinedRoomAsync(token).AsAsyncUnitUniTask(),
+                Pun2TaskCallback.OnJoinRandomFailedAsync(token));
 
             var valid = PhotonNetwork.JoinRandomRoom(
                 expectedCustomRoomProperties,
@@ -409,7 +416,7 @@ namespace Pun2Task
                 expectedUsers);
             if (!valid) throw new InvalidRoomOperationException("It is not ready to join a room.");
 
-            var (winIndex, _, (returnCode, message)) = await task.AttachExternalCancellation(token);
+            var (winIndex, _, (returnCode, message)) = await task;
             if (winIndex == 0) return;
             throw new FailedToJoinRoomException(returnCode, message);
         }
@@ -436,13 +443,13 @@ namespace Pun2Task
         public static async UniTask RejoinRoomAsync(string roomName, CancellationToken token = default)
         {
             var task = UniTask.WhenAny(
-                Pun2TaskCallback.OnJoinedRoomAsync().AsAsyncUnitUniTask(),
-                Pun2TaskCallback.OnJoinRoomFailedAsync());
+                Pun2TaskCallback.OnJoinedRoomAsync(token).AsAsyncUnitUniTask(),
+                Pun2TaskCallback.OnJoinRoomFailedAsync(token));
 
             var valid = PhotonNetwork.RejoinRoom(roomName);
             if (!valid) throw new InvalidRoomOperationException("It is not ready to join a room.");
 
-            var (winIndex, _, (returnCode, message)) = await task.AttachExternalCancellation(token);
+            var (winIndex, _, (returnCode, message)) = await task;
             if (winIndex == 0) return;
             throw new FailedToJoinRoomException(returnCode, message);
         }
@@ -464,13 +471,13 @@ namespace Pun2Task
         public static async UniTask ReconnectAndRejoinAsync(CancellationToken token)
         {
             var task = UniTask.WhenAny(
-                Pun2TaskCallback.OnJoinedRoomAsync().AsAsyncUnitUniTask(),
-                Pun2TaskCallback.OnJoinRoomFailedAsync());
+                Pun2TaskCallback.OnJoinedRoomAsync(token).AsAsyncUnitUniTask(),
+                Pun2TaskCallback.OnJoinRoomFailedAsync(token));
 
             var valid = PhotonNetwork.ReconnectAndRejoin();
             if (!valid) throw new InvalidRoomOperationException("It is not ready to join a room.");
 
-            var (winIndex, _, (returnCode, message)) = await task.AttachExternalCancellation(token);
+            var (winIndex, _, (returnCode, message)) = await task;
             if (winIndex == 0) return;
             throw new FailedToJoinRoomException(returnCode, message);
         }
@@ -491,8 +498,11 @@ namespace Pun2Task
         /// <param name="becomeInactive">If this client becomes inactive in a room with playerTTL &lt; 0. Defaults to true.</param>
         public static async UniTask LeaveRoomAsync(bool becomeInactive = true)
         {
-            if (!PhotonNetwork.InRoom) return;
-            PhotonNetwork.LeaveRoom(becomeInactive);
+            if (!PhotonNetwork.LeaveRoom(becomeInactive))
+            {
+                throw new InvalidRoomOperationException("Failed to leave room.");
+            }
+
             await Pun2TaskCallback.OnLeftRoomAsync();
         }
 
@@ -516,10 +526,15 @@ namespace Pun2Task
         ///
         /// You can use JoinRandomRoom without being in a lobby!
         /// </remarks>
-        public static async UniTask JoinLobbyAsync(TypedLobby typedLobby = null, CancellationToken token = default)
+        public static async UniTask JoinLobbyAsync(TypedLobby typedLobby = null,
+            CancellationToken token = default)
         {
-            PhotonNetwork.JoinLobby(typedLobby);
-            await Pun2TaskCallback.OnJoinedLobbyAsync().AttachExternalCancellation(token);
+            if (!PhotonNetwork.JoinLobby(typedLobby))
+            {
+                throw new InvalidNetworkOperationException("Failed to join lobby.");
+            }
+
+            await Pun2TaskCallback.OnJoinedLobbyAsync(token);
         }
 
         /// <summary>Leave a lobby to stop getting updates about available rooms.</summary>
@@ -534,10 +549,13 @@ namespace Pun2Task
         /// </remarks>
         public static async UniTask LeaveLobbyAsync(CancellationToken token = default)
         {
-            if (PhotonNetwork.LeaveLobby())
+            if (!PhotonNetwork.LeaveLobby())
             {
-                await Pun2TaskCallback.OnLeftLobbyAsync().AttachExternalCancellation(token);
+                throw new InvalidNetworkOperationException("Failed to leave lobby.");
             }
+
+            await Pun2TaskCallback.OnLeftLobbyAsync(token);
+
         }
 
         #endregion
@@ -559,8 +577,11 @@ namespace Pun2Task
             string sqlLobbyFilter,
             CancellationToken token = default)
         {
-            PhotonNetwork.GetCustomRoomList(typedLobby, sqlLobbyFilter);
-            return await Pun2TaskCallback.OnRoomListUpdateAsync().AttachExternalCancellation(token);
+            if (!PhotonNetwork.GetCustomRoomList(typedLobby, sqlLobbyFilter))
+            {
+                throw new InvalidNetworkOperationException("Failed to get custom room list.");
+            }
+            return await Pun2TaskCallback.OnRoomListUpdateAsync(token);
         }
 
         #region Exceptions
@@ -575,7 +596,14 @@ namespace Pun2Task
             }
         }
 
-        public class InvalidRoomOperationException : Pun2TaskException
+        public class InvalidNetworkOperationException : Pun2TaskException
+        {
+            public InvalidNetworkOperationException(string message) : base(message)
+            {
+            }
+        }
+
+        public class InvalidRoomOperationException : InvalidNetworkOperationException
         {
             public InvalidRoomOperationException(string message) : base(message)
             {
@@ -587,6 +615,16 @@ namespace Pun2Task
             public short ReturnCode { get; }
 
             public FailedToJoinRoomException(short returnCode, string message) : base(message)
+            {
+                ReturnCode = returnCode;
+            }
+        }
+
+        public class FailedToJoinLobbyException : Pun2TaskException
+        {
+            public short ReturnCode { get; }
+
+            public FailedToJoinLobbyException(short returnCode, string message) : base(message)
             {
                 ReturnCode = returnCode;
             }
