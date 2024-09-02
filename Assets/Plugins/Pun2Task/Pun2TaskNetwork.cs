@@ -49,8 +49,9 @@ namespace Pun2Task
 
             var result = PhotonNetwork.ConnectUsingSettings();
             if (!result)
-                throw new InvalidNetworkOperationException(nameof(ConnectUsingSettingsAsync) +
-                                                           " is not ready to connect.");
+            {
+                throw new InvalidNetworkOperationException(nameof(ConnectUsingSettingsAsync) + " is not ready to connect.");
+            }
 
             var (winIndex, _, disconnectCause) = await task;
 
@@ -69,8 +70,10 @@ namespace Pun2Task
 
             var result = PhotonNetwork.ConnectUsingSettings(appSettings, startInOfflineMode);
             if (!result)
+            {
                 throw new InvalidNetworkOperationException(nameof(ConnectUsingSettingsAsync) +
                                                            " is not ready to connect.");
+            }
 
             var (winIndex, _, disconnectCause) = await task;
 
@@ -555,7 +558,6 @@ namespace Pun2Task
             }
 
             await Pun2TaskCallback.OnLeftLobbyAsync(token);
-
         }
 
         #endregion
@@ -581,6 +583,7 @@ namespace Pun2Task
             {
                 throw new InvalidNetworkOperationException("Failed to get custom room list.");
             }
+
             return await Pun2TaskCallback.OnRoomListUpdateAsync(token);
         }
 
