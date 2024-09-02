@@ -42,7 +42,7 @@ MIT License.
 ![image](https://user-images.githubusercontent.com/861868/101975816-d7457300-3c82-11eb-9c17-07805e7c3b52.png)
 
 ```
-https://github.com/TORISOUP/Pun2Task.git?path=Assets/Plugins/Pun2Task#1.0.1
+https://github.com/TORISOUP/Pun2Task.git?path=Assets/Plugins/Pun2Task#1.1.0
 ```
 
 
@@ -52,7 +52,60 @@ https://github.com/TORISOUP/Pun2Task.git?path=Assets/Plugins/Pun2Task#1.0.1
 
 If you installed UniTask without using the package manager, add **PUN_TO_UNITASK_SUPPORT** to your `Scripting Define Symbols`.
 
+
+## 挙動の説明 / Behavior
+
+### Pun2TaskNetwork
+
+`Pun2TaskNetwork`はPUN2の`PhotonNetwork`のAPIを非同期的に実行できるようにするstaticクラスです。実装としては`PhotonNetwork`のAPI呼び出しのラッパーとなっています。
+ただし`PhotonNetwork`のAPI呼び出しと異なる点として、APIの実行に失敗した場合は必ず`InvalidNetworkOperationException`を発行します。
+
+`Pun2TaskNetwork` is a static class that allows asynchronous execution of PUN2's `PhotonNetwork` API. As an implementation, it is a wrapper for the `PhotonNetwork` API calls.
+However, it differs from `PhotonNetwork` in that it always issues an `InvalidNetworkOperationException` if the API fails to execute.
+
+```cs
+private void ConnectSample()
+{
+    // 元のAPIは呼び出しに失敗した場合は false を返す
+    // The original API returns false if the call fails.
+    if (!PhotonNetwork.ConnectUsingSettings())
+    {
+        Debug.LogError("Error: ConnectUsingSettings failed.");
+    }
+    else
+    {
+        Debug.Log("Connected to master server.");
+    }
+}
+
+private async UniTaskVoid ConnectionSampleAsync(CancellationToken token)
+{
+    try
+    {
+        // Pun2TaskNetworkでは失敗時は必ず例外を発行する
+        // Pun2TaskNetwork always throws an exception when it fails.
+        await Pun2TaskNetwork.ConnectUsingSettingsAsync(token);
+
+        Debug.Log("Connected to master server.");
+    }
+    catch (Pun2TaskNetwork.InvalidNetworkOperationException ex)
+    {
+        // 設定値不足などでそもそも接続処理自体が実行できない場合は例外
+        //  When the connection process itself cannot be executed due to insufficient settings, etc.
+        Debug.LogError(ex);
+    }
+    catch (Pun2TaskNetwork.ConnectionFailedException ex)
+    {
+        // 接続失敗時は例外
+        // Throw ConnectionFailedException when 'OnDisconnected' called.
+        Debug.LogError(ex);
+    }
+}
+```
+
+
 ## 使い方/How to use
+
 
 ### Connect to Photon server
 
@@ -65,9 +118,15 @@ private async UniTaskVoid ConnectionSampleAsync(CancellationToken token)
     {
         // OnConnectedToMaster が呼び出されるのを待てる
         // You can use async/await to wait for 'OnConnectedToMaster'.
-        await Pun2TaskNetwork.ConnectUsingSettingsAsync(token);
+        await Pun2TaskNetwork.ConnectUsingSettingsAsync(destroyCancellationToken);
 
         Debug.Log("Connected to master server.");
+    }
+    catch (Pun2TaskNetwork.InvalidNetworkOperationException ex)
+    {
+        // 設定値不足などでそもそも接続処理自体が実行できない場合は例外
+        //  When the connection process itself cannot be executed due to insufficient settings, etc.
+        Debug.LogError(ex);
     }
     catch (Pun2TaskNetwork.ConnectionFailedException ex)
     {
@@ -133,17 +192,17 @@ private async UniTaskVoid Callbacks(CancellationToken token)
 {
     // 各種コールバックを待てる
     // You can await connection callbacks.
-    await Pun2TaskCallback.OnConnectedAsync();
-    await Pun2TaskCallback.OnCreatedRoomAsync();
-    await Pun2TaskCallback.OnJoinedRoomAsync();
-    await Pun2TaskCallback.OnLeftRoomAsync();
+    await Pun2TaskCallback.OnConnectedAsync(token);
+    await Pun2TaskCallback.OnCreatedRoomAsync(token);
+    await Pun2TaskCallback.OnJoinedRoomAsync(token);
+    await Pun2TaskCallback.OnLeftRoomAsync(token);
     // etc.
 
     // パラメータの取得も可能
     // You can get the parameters.
-    DisconnectCause disconnectCause = await Pun2TaskCallback.OnDisconnectedAsync();
-    Player newPlayer = await Pun2TaskCallback.OnPlayerEnteredRoomAsync();
-    Player leftPlayer = await Pun2TaskCallback.OnPlayerLeftRoomAsync();
+    DisconnectCause disconnectCause = await Pun2TaskCallback.OnDisconnectedAsync(token);
+    Player newPlayer = await Pun2TaskCallback.OnPlayerEnteredRoomAsync(token);
+    Player leftPlayer = await Pun2TaskCallback.OnPlayerLeftRoomAsync(token);
     // etc.
 
     // OnPlayerEnteredRoom and OnPlayerLeftRoomAsync can be treated as UniTaskAsyncEnumerable.

@@ -1,5 +1,6 @@
 #if PUN_TO_UNITASK_SUPPORT
 using System.Collections.Generic;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using ExitGames.Client.Photon;
 using Photon.Pun;
@@ -13,18 +14,15 @@ namespace Pun2Task.Callbacks
 
         private AsyncReactiveProperty<AsyncUnit> _onConnected;
 
-        public UniTask OnConnectedAsync
+        public UniTask GetOnConnectedAsync(CancellationToken ct = default)
         {
-            get
+            if (_onConnected == null)
             {
-                if (_onConnected == null)
-                {
-                    _onConnected = new AsyncReactiveProperty<AsyncUnit>(AsyncUnit.Default);
-                    _onConnected.AddTo(this.GetCancellationTokenOnDestroy());
-                }
-
-                return _onConnected.WaitAsync();
+                _onConnected = new AsyncReactiveProperty<AsyncUnit>(AsyncUnit.Default);
+                _onConnected.AddTo(this.GetCancellationTokenOnDestroy());
             }
+
+            return _onConnected.WaitAsync(ct);
         }
 
         public override void OnConnected()
@@ -41,18 +39,15 @@ namespace Pun2Task.Callbacks
 
         private AsyncReactiveProperty<AsyncUnit> _onLeftRoom;
 
-        public UniTask OnLeftRoomAsync
+        public UniTask GetOnLeftRoomAsync(CancellationToken ct = default)
         {
-            get
+            if (_onLeftRoom == null)
             {
-                if (_onLeftRoom == null)
-                {
-                    _onLeftRoom = new AsyncReactiveProperty<AsyncUnit>(AsyncUnit.Default);
-                    _onLeftRoom.AddTo(this.GetCancellationTokenOnDestroy());
-                }
-
-                return _onLeftRoom.WaitAsync();
+                _onLeftRoom = new AsyncReactiveProperty<AsyncUnit>(AsyncUnit.Default);
+                _onLeftRoom.AddTo(this.GetCancellationTokenOnDestroy());
             }
+
+            return _onLeftRoom.WaitAsync(ct);
         }
 
 
@@ -70,18 +65,15 @@ namespace Pun2Task.Callbacks
 
         private AsyncReactiveProperty<Player> _onMasterClientSwitched;
 
-        public UniTask<Player> OnMasterClientSwitchedAsync
+        public UniTask<Player> GetOnMasterClientSwitchedAsync(CancellationToken ct = default)
         {
-            get
+            if (_onMasterClientSwitched == null)
             {
-                if (_onMasterClientSwitched == null)
-                {
-                    _onMasterClientSwitched = new AsyncReactiveProperty<Player>(default);
-                    _onMasterClientSwitched.AddTo(this.GetCancellationTokenOnDestroy());
-                }
-
-                return _onMasterClientSwitched.WaitAsync();
+                _onMasterClientSwitched = new AsyncReactiveProperty<Player>(default);
+                _onMasterClientSwitched.AddTo(this.GetCancellationTokenOnDestroy());
             }
+
+            return _onMasterClientSwitched.WaitAsync(ct);
         }
 
 
@@ -99,18 +91,15 @@ namespace Pun2Task.Callbacks
 
         private AsyncReactiveProperty<(short returnCode, string message)> _onCreateRoomFailed;
 
-        public UniTask<(short returnCode, string message)> OnCreateRoomFailedAsync
+        public UniTask<(short returnCode, string message)> GetOnCreateRoomFailedAsync(CancellationToken ct = default)
         {
-            get
+            if (_onCreateRoomFailed == null)
             {
-                if (_onCreateRoomFailed == null)
-                {
-                    _onCreateRoomFailed = new AsyncReactiveProperty<(short returnCode, string message)>(default);
-                    _onCreateRoomFailed.AddTo(this.GetCancellationTokenOnDestroy());
-                }
-
-                return _onCreateRoomFailed.WaitAsync();
+                _onCreateRoomFailed = new AsyncReactiveProperty<(short returnCode, string message)>(default);
+                _onCreateRoomFailed.AddTo(this.GetCancellationTokenOnDestroy());
             }
+
+            return _onCreateRoomFailed.WaitAsync(ct);
         }
 
 
@@ -128,18 +117,15 @@ namespace Pun2Task.Callbacks
 
         private AsyncReactiveProperty<(short returnCode, string message)> _onJoinRoomFailed;
 
-        public UniTask<(short returnCode, string message)> OnJoinRoomFailedAsync
+        public UniTask<(short returnCode, string message)> GetOnJoinRoomFailedAsync(CancellationToken ct = default)
         {
-            get
+            if (_onJoinRoomFailed == null)
             {
-                if (_onJoinRoomFailed == null)
-                {
-                    _onJoinRoomFailed = new AsyncReactiveProperty<(short returnCode, string message)>(default);
-                    _onJoinRoomFailed.AddTo(this.GetCancellationTokenOnDestroy());
-                }
-
-                return _onJoinRoomFailed.WaitAsync();
+                _onJoinRoomFailed = new AsyncReactiveProperty<(short returnCode, string message)>(default);
+                _onJoinRoomFailed.AddTo(this.GetCancellationTokenOnDestroy());
             }
+
+            return _onJoinRoomFailed.WaitAsync(ct);
         }
 
 
@@ -157,18 +143,15 @@ namespace Pun2Task.Callbacks
 
         private AsyncReactiveProperty<AsyncUnit> _onCreatedRoom;
 
-        public UniTask OnCreatedRoomAsync
+        public UniTask GetOnCreatedRoomAsync(CancellationToken ct = default)
         {
-            get
+            if (_onCreatedRoom == null)
             {
-                if (_onCreatedRoom == null)
-                {
-                    _onCreatedRoom = new AsyncReactiveProperty<AsyncUnit>(AsyncUnit.Default);
-                    _onCreatedRoom.AddTo(this.GetCancellationTokenOnDestroy());
-                }
-
-                return _onCreatedRoom.WaitAsync();
+                _onCreatedRoom = new AsyncReactiveProperty<AsyncUnit>(AsyncUnit.Default);
+                _onCreatedRoom.AddTo(this.GetCancellationTokenOnDestroy());
             }
+
+            return _onCreatedRoom.WaitAsync(ct);
         }
 
 
@@ -186,18 +169,15 @@ namespace Pun2Task.Callbacks
 
         private AsyncReactiveProperty<AsyncUnit> _onJoinedLobby;
 
-        public UniTask OnJoinedLobbyAsync
+        public UniTask GetOnJoinedLobbyAsync(CancellationToken ct = default)
         {
-            get
+            if (_onJoinedLobby == null)
             {
-                if (_onJoinedLobby == null)
-                {
-                    _onJoinedLobby = new AsyncReactiveProperty<AsyncUnit>(AsyncUnit.Default);
-                    _onJoinedLobby.AddTo(this.GetCancellationTokenOnDestroy());
-                }
-
-                return _onJoinedLobby.WaitAsync();
+                _onJoinedLobby = new AsyncReactiveProperty<AsyncUnit>(AsyncUnit.Default);
+                _onJoinedLobby.AddTo(this.GetCancellationTokenOnDestroy());
             }
+
+            return _onJoinedLobby.WaitAsync(ct);
         }
 
 
@@ -215,18 +195,15 @@ namespace Pun2Task.Callbacks
 
         private AsyncReactiveProperty<AsyncUnit> _onLeftLobby;
 
-        public UniTask OnLeftLobbyAsync
+        public UniTask GetOnLeftLobbyAsync(CancellationToken ct = default)
         {
-            get
+            if (_onLeftLobby == null)
             {
-                if (_onLeftLobby == null)
-                {
-                    _onLeftLobby = new AsyncReactiveProperty<AsyncUnit>(AsyncUnit.Default);
-                    _onLeftLobby.AddTo(this.GetCancellationTokenOnDestroy());
-                }
-
-                return _onLeftLobby.WaitAsync();
+                _onLeftLobby = new AsyncReactiveProperty<AsyncUnit>(AsyncUnit.Default);
+                _onLeftLobby.AddTo(this.GetCancellationTokenOnDestroy());
             }
+
+            return _onLeftLobby.WaitAsync(ct);
         }
 
 
@@ -244,18 +221,15 @@ namespace Pun2Task.Callbacks
 
         private AsyncReactiveProperty<DisconnectCause> _onDisconnected;
 
-        public UniTask<DisconnectCause> OnDisconnectedAsync
+        public UniTask<DisconnectCause> GetOnDisconnectedAsync(CancellationToken ct = default)
         {
-            get
+            if (_onDisconnected == null)
             {
-                if (_onDisconnected == null)
-                {
-                    _onDisconnected = new AsyncReactiveProperty<DisconnectCause>(default);
-                    _onDisconnected.AddTo(this.GetCancellationTokenOnDestroy());
-                }
-
-                return _onDisconnected.WaitAsync();
+                _onDisconnected = new AsyncReactiveProperty<DisconnectCause>(default);
+                _onDisconnected.AddTo(this.GetCancellationTokenOnDestroy());
             }
+
+            return _onDisconnected.WaitAsync(ct);
         }
 
 
@@ -273,18 +247,15 @@ namespace Pun2Task.Callbacks
 
         private AsyncReactiveProperty<RegionHandler> _onRegionListReceived;
 
-        public UniTask<RegionHandler> OnRegionListReceivedAsync
+        public UniTask<RegionHandler> GetOnRegionListReceivedAsync(CancellationToken ct = default)
         {
-            get
+            if (_onRegionListReceived == null)
             {
-                if (_onRegionListReceived == null)
-                {
-                    _onRegionListReceived = new AsyncReactiveProperty<RegionHandler>(default);
-                    _onRegionListReceived.AddTo(this.GetCancellationTokenOnDestroy());
-                }
-
-                return _onRegionListReceived.WaitAsync();
+                _onRegionListReceived = new AsyncReactiveProperty<RegionHandler>(default);
+                _onRegionListReceived.AddTo(this.GetCancellationTokenOnDestroy());
             }
+
+            return _onRegionListReceived.WaitAsync(ct);
         }
 
         public override void OnRegionListReceived(RegionHandler regionHandler)
@@ -301,18 +272,15 @@ namespace Pun2Task.Callbacks
 
         private AsyncReactiveProperty<IList<RoomInfo>> _onRoomListUpdate;
 
-        public UniTask<IList<RoomInfo>> OnRoomListUpdateAsync
+        public UniTask<IList<RoomInfo>> GetOnRoomListUpdateAsync(CancellationToken ct = default)
         {
-            get
+            if (_onRoomListUpdate == null)
             {
-                if (_onRoomListUpdate == null)
-                {
-                    _onRoomListUpdate = new AsyncReactiveProperty<IList<RoomInfo>>(default);
-                    _onRoomListUpdate.AddTo(this.GetCancellationTokenOnDestroy());
-                }
-
-                return _onRoomListUpdate.WaitAsync();
+                _onRoomListUpdate = new AsyncReactiveProperty<IList<RoomInfo>>(default);
+                _onRoomListUpdate.AddTo(this.GetCancellationTokenOnDestroy());
             }
+
+            return _onRoomListUpdate.WaitAsync(ct);
         }
 
 
@@ -330,18 +298,15 @@ namespace Pun2Task.Callbacks
 
         private AsyncReactiveProperty<AsyncUnit> _onJoinedRoom;
 
-        public UniTask OnJoinedRoomAsync
+        public UniTask GetOnJoinedRoomAsync(CancellationToken ct = default)
         {
-            get
+            if (_onJoinedRoom == null)
             {
-                if (_onJoinedRoom == null)
-                {
-                    _onJoinedRoom = new AsyncReactiveProperty<AsyncUnit>(AsyncUnit.Default);
-                    _onJoinedRoom.AddTo(this.GetCancellationTokenOnDestroy());
-                }
-
-                return _onJoinedRoom.WaitAsync();
+                _onJoinedRoom = new AsyncReactiveProperty<AsyncUnit>(AsyncUnit.Default);
+                _onJoinedRoom.AddTo(this.GetCancellationTokenOnDestroy());
             }
+
+            return _onJoinedRoom.WaitAsync(ct);
         }
 
 
@@ -359,18 +324,15 @@ namespace Pun2Task.Callbacks
 
         private AsyncReactiveProperty<Player> _onPlayerEnteredRoom;
 
-        public UniTask<Player> OnPlayerEnteredRoomAsync
+        public UniTask<Player> GetOnPlayerEnteredRoomAsync(CancellationToken ct = default)
         {
-            get
+            if (_onPlayerEnteredRoom == null)
             {
-                if (_onPlayerEnteredRoom == null)
-                {
-                    _onPlayerEnteredRoom = new AsyncReactiveProperty<Player>(default);
-                    _onPlayerEnteredRoom.AddTo(this.GetCancellationTokenOnDestroy());
-                }
-
-                return _onPlayerEnteredRoom.WaitAsync();
+                _onPlayerEnteredRoom = new AsyncReactiveProperty<Player>(default);
+                _onPlayerEnteredRoom.AddTo(this.GetCancellationTokenOnDestroy());
             }
+
+            return _onPlayerEnteredRoom.WaitAsync(ct);
         }
 
         public IUniTaskAsyncEnumerable<Player> OnPlayerEnteredRoomAsyncEnumerable
@@ -403,18 +365,15 @@ namespace Pun2Task.Callbacks
 
         private AsyncReactiveProperty<Player> _onPlayerLeftRoom;
 
-        public UniTask<Player> OnPlayerLeftRoomAsync
+        public UniTask<Player> GetOnPlayerLeftRoomAsync(CancellationToken ct = default)
         {
-            get
+            if (_onPlayerLeftRoom == null)
             {
-                if (_onPlayerLeftRoom == null)
-                {
-                    _onPlayerLeftRoom = new AsyncReactiveProperty<Player>(default);
-                    _onPlayerLeftRoom.AddTo(this.GetCancellationTokenOnDestroy());
-                }
-
-                return _onPlayerLeftRoom.WaitAsync();
+                _onPlayerLeftRoom = new AsyncReactiveProperty<Player>(default);
+                _onPlayerLeftRoom.AddTo(this.GetCancellationTokenOnDestroy());
             }
+
+            return _onPlayerLeftRoom.WaitAsync(ct);
         }
 
         public IUniTaskAsyncEnumerable<Player> OnPlayerLeftRoomAsyncEnumerable
@@ -447,18 +406,15 @@ namespace Pun2Task.Callbacks
 
         private AsyncReactiveProperty<(short returnCode, string message)> _onJoinRandomFailed;
 
-        public UniTask<(short returnCode, string message)> OnJoinRandomFailedAsync
+        public UniTask<(short returnCode, string message)> GetOnJoinRandomFailedAsync(CancellationToken ct = default)
         {
-            get
+            if (_onJoinRandomFailed == null)
             {
-                if (_onJoinRandomFailed == null)
-                {
-                    _onJoinRandomFailed = new AsyncReactiveProperty<(short returnCode, string message)>(default);
-                    _onJoinRandomFailed.AddTo(this.GetCancellationTokenOnDestroy());
-                }
-
-                return _onJoinRandomFailed.WaitAsync();
+                _onJoinRandomFailed = new AsyncReactiveProperty<(short returnCode, string message)>(default);
+                _onJoinRandomFailed.AddTo(this.GetCancellationTokenOnDestroy());
             }
+
+            return _onJoinRandomFailed.WaitAsync(ct);
         }
 
 
@@ -476,18 +432,15 @@ namespace Pun2Task.Callbacks
 
         private AsyncReactiveProperty<AsyncUnit> _onConnectedToMaster;
 
-        public UniTask OnConnectedToMasterAsync
+        public UniTask GetOnConnectedToMasterAsync(CancellationToken ct = default)
         {
-            get
+            if (_onConnectedToMaster == null)
             {
-                if (_onConnectedToMaster == null)
-                {
-                    _onConnectedToMaster = new AsyncReactiveProperty<AsyncUnit>(AsyncUnit.Default);
-                    _onConnectedToMaster.AddTo(this.GetCancellationTokenOnDestroy());
-                }
-
-                return _onConnectedToMaster.WaitAsync();
+                _onConnectedToMaster = new AsyncReactiveProperty<AsyncUnit>(AsyncUnit.Default);
+                _onConnectedToMaster.AddTo(this.GetCancellationTokenOnDestroy());
             }
+
+            return _onConnectedToMaster.WaitAsync(ct);
         }
 
 
@@ -505,18 +458,15 @@ namespace Pun2Task.Callbacks
 
         private AsyncReactiveProperty<Hashtable> _onRoomPropertiesUpdate;
 
-        public UniTask<Hashtable> OnRoomPropertiesUpdateAsync
+        public UniTask<Hashtable> GetOnRoomPropertiesUpdateAsync(CancellationToken ct = default)
         {
-            get
+            if (_onRoomPropertiesUpdate == null)
             {
-                if (_onRoomPropertiesUpdate == null)
-                {
-                    _onRoomPropertiesUpdate = new AsyncReactiveProperty<Hashtable>(default);
-                    _onRoomPropertiesUpdate.AddTo(this.GetCancellationTokenOnDestroy());
-                }
-
-                return _onRoomPropertiesUpdate.WaitAsync();
+                _onRoomPropertiesUpdate = new AsyncReactiveProperty<Hashtable>(default);
+                _onRoomPropertiesUpdate.AddTo(this.GetCancellationTokenOnDestroy());
             }
+
+            return _onRoomPropertiesUpdate.WaitAsync(ct);
         }
 
 
@@ -534,19 +484,17 @@ namespace Pun2Task.Callbacks
 
         private AsyncReactiveProperty<(Player targetPlayer, Hashtable changedProps)> _onPlayerPropertiesUpdate;
 
-        public UniTask<(Player targetPlayer, Hashtable changedProps)> OnPlayerPropertiesUpdateAsync
+        public UniTask<(Player targetPlayer, Hashtable changedProps)> GetOnPlayerPropertiesUpdateAsync(
+            CancellationToken ct = default)
         {
-            get
+            if (_onPlayerPropertiesUpdate == null)
             {
-                if (_onPlayerPropertiesUpdate == null)
-                {
-                    _onPlayerPropertiesUpdate =
-                        new AsyncReactiveProperty<(Player targetPlayer, Hashtable changedProps)>(default);
-                    _onPlayerPropertiesUpdate.AddTo(this.GetCancellationTokenOnDestroy());
-                }
-
-                return _onPlayerPropertiesUpdate.WaitAsync();
+                _onPlayerPropertiesUpdate =
+                    new AsyncReactiveProperty<(Player targetPlayer, Hashtable changedProps)>(default);
+                _onPlayerPropertiesUpdate.AddTo(this.GetCancellationTokenOnDestroy());
             }
+
+            return _onPlayerPropertiesUpdate.WaitAsync(ct);
         }
 
 
@@ -564,18 +512,15 @@ namespace Pun2Task.Callbacks
 
         private AsyncReactiveProperty<IList<FriendInfo>> _onFriendListUpdate;
 
-        public UniTask<IList<FriendInfo>> OnFriendListUpdateAsync
+        public UniTask<IList<FriendInfo>> GetOnFriendListUpdateAsync(CancellationToken ct = default)
         {
-            get
+            if (_onFriendListUpdate == null)
             {
-                if (_onFriendListUpdate == null)
-                {
-                    _onFriendListUpdate = new AsyncReactiveProperty<IList<FriendInfo>>(default);
-                    _onFriendListUpdate.AddTo(this.GetCancellationTokenOnDestroy());
-                }
-
-                return _onFriendListUpdate.WaitAsync();
+                _onFriendListUpdate = new AsyncReactiveProperty<IList<FriendInfo>>(default);
+                _onFriendListUpdate.AddTo(this.GetCancellationTokenOnDestroy());
             }
+
+            return _onFriendListUpdate.WaitAsync(ct);
         }
 
 
@@ -593,19 +538,17 @@ namespace Pun2Task.Callbacks
 
         private AsyncReactiveProperty<IReadOnlyDictionary<string, object>> _onCustomAuthenticationResponse;
 
-        public UniTask<IReadOnlyDictionary<string, object>> OnCustomAuthenticationResponseAsync
+        public UniTask<IReadOnlyDictionary<string, object>> GetOnCustomAuthenticationResponseAsync(
+            CancellationToken ct = default)
         {
-            get
+            if (_onCustomAuthenticationResponse == null)
             {
-                if (_onCustomAuthenticationResponse == null)
-                {
-                    _onCustomAuthenticationResponse =
-                        new AsyncReactiveProperty<IReadOnlyDictionary<string, object>>(default);
-                    _onCustomAuthenticationResponse.AddTo(this.GetCancellationTokenOnDestroy());
-                }
-
-                return _onCustomAuthenticationResponse.WaitAsync();
+                _onCustomAuthenticationResponse =
+                    new AsyncReactiveProperty<IReadOnlyDictionary<string, object>>(default);
+                _onCustomAuthenticationResponse.AddTo(this.GetCancellationTokenOnDestroy());
             }
+
+            return _onCustomAuthenticationResponse.WaitAsync(ct);
         }
 
 
@@ -623,18 +566,15 @@ namespace Pun2Task.Callbacks
 
         private AsyncReactiveProperty<string> _onCustomAuthenticationFailed;
 
-        public UniTask<string> OnCustomAuthenticationFailedAsync
+        public UniTask<string> GetOnCustomAuthenticationFailedAsync(CancellationToken ct = default)
         {
-            get
+            if (_onCustomAuthenticationFailed == null)
             {
-                if (_onCustomAuthenticationFailed == null)
-                {
-                    _onCustomAuthenticationFailed = new AsyncReactiveProperty<string>(default);
-                    _onCustomAuthenticationFailed.AddTo(this.GetCancellationTokenOnDestroy());
-                }
-
-                return _onCustomAuthenticationFailed.WaitAsync();
+                _onCustomAuthenticationFailed = new AsyncReactiveProperty<string>(default);
+                _onCustomAuthenticationFailed.AddTo(this.GetCancellationTokenOnDestroy());
             }
+
+            return _onCustomAuthenticationFailed.WaitAsync(ct);
         }
 
 
@@ -652,18 +592,15 @@ namespace Pun2Task.Callbacks
 
         private AsyncReactiveProperty<OperationResponse> _onWebRpcResponse;
 
-        public UniTask<OperationResponse> OnWebRpcResponseAsync
+        public UniTask<OperationResponse> GetOnWebRpcResponseAsync(CancellationToken ct = default)
         {
-            get
+            if (_onWebRpcResponse == null)
             {
-                if (_onWebRpcResponse == null)
-                {
-                    _onWebRpcResponse = new AsyncReactiveProperty<OperationResponse>(default);
-                    _onWebRpcResponse.AddTo(this.GetCancellationTokenOnDestroy());
-                }
-
-                return _onWebRpcResponse.WaitAsync();
+                _onWebRpcResponse = new AsyncReactiveProperty<OperationResponse>(default);
+                _onWebRpcResponse.AddTo(this.GetCancellationTokenOnDestroy());
             }
+
+            return _onWebRpcResponse.WaitAsync(ct);
         }
 
 
@@ -681,18 +618,15 @@ namespace Pun2Task.Callbacks
 
         private AsyncReactiveProperty<IList<TypedLobbyInfo>> _onLobbyStatisticsUpdate;
 
-        public UniTask<IList<TypedLobbyInfo>> OnLobbyStatisticsUpdateAsync
+        public UniTask<IList<TypedLobbyInfo>> GetOnLobbyStatisticsUpdateAsync(CancellationToken ct = default)
         {
-            get
+            if (_onLobbyStatisticsUpdate == null)
             {
-                if (_onLobbyStatisticsUpdate == null)
-                {
-                    _onLobbyStatisticsUpdate = new AsyncReactiveProperty<IList<TypedLobbyInfo>>(default);
-                    _onLobbyStatisticsUpdate.AddTo(this.GetCancellationTokenOnDestroy());
-                }
-
-                return _onLobbyStatisticsUpdate.WaitAsync();
+                _onLobbyStatisticsUpdate = new AsyncReactiveProperty<IList<TypedLobbyInfo>>(default);
+                _onLobbyStatisticsUpdate.AddTo(this.GetCancellationTokenOnDestroy());
             }
+
+            return _onLobbyStatisticsUpdate.WaitAsync(ct);
         }
 
 
@@ -710,18 +644,15 @@ namespace Pun2Task.Callbacks
 
         private AsyncReactiveProperty<ErrorInfo> _onErrorInfo;
 
-        public UniTask<ErrorInfo> OnErrorInfoAsync
+        public UniTask<ErrorInfo> GetOnErrorInfoAsync(CancellationToken ct = default)
         {
-            get
+            if (_onErrorInfo == null)
             {
-                if (_onErrorInfo == null)
-                {
-                    _onErrorInfo = new AsyncReactiveProperty<ErrorInfo>(default);
-                    _onErrorInfo.AddTo(this.GetCancellationTokenOnDestroy());
-                }
-
-                return _onErrorInfo.WaitAsync();
+                _onErrorInfo = new AsyncReactiveProperty<ErrorInfo>(default);
+                _onErrorInfo.AddTo(this.GetCancellationTokenOnDestroy());
             }
+
+            return _onErrorInfo.WaitAsync(ct);
         }
 
         public override void OnErrorInfo(ErrorInfo errorInfo)
