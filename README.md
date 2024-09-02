@@ -42,7 +42,7 @@ MIT License.
 ![image](https://user-images.githubusercontent.com/861868/101975816-d7457300-3c82-11eb-9c17-07805e7c3b52.png)
 
 ```
-https://github.com/TORISOUP/Pun2Task.git?path=Assets/Plugins/Pun2Task#1.0.1
+https://github.com/TORISOUP/Pun2Task.git?path=Assets/Plugins/Pun2Task#1.0.3
 ```
 
 
@@ -65,9 +65,15 @@ private async UniTaskVoid ConnectionSampleAsync(CancellationToken token)
     {
         // OnConnectedToMaster が呼び出されるのを待てる
         // You can use async/await to wait for 'OnConnectedToMaster'.
-        await Pun2TaskNetwork.ConnectUsingSettingsAsync(token);
+        await Pun2TaskNetwork.ConnectUsingSettingsAsync(destroyCancellationToken);
 
         Debug.Log("Connected to master server.");
+    }
+    catch (Pun2TaskNetwork.InvalidNetworkOperationException ex)
+    {
+        // 設定値不足などでそもそも接続処理自体が実行できない場合は例外
+        //  When the connection process itself cannot be executed due to insufficient settings, etc.
+        Debug.LogError(ex);
     }
     catch (Pun2TaskNetwork.ConnectionFailedException ex)
     {
@@ -133,17 +139,17 @@ private async UniTaskVoid Callbacks(CancellationToken token)
 {
     // 各種コールバックを待てる
     // You can await connection callbacks.
-    await Pun2TaskCallback.OnConnectedAsync();
-    await Pun2TaskCallback.OnCreatedRoomAsync();
-    await Pun2TaskCallback.OnJoinedRoomAsync();
-    await Pun2TaskCallback.OnLeftRoomAsync();
+    await Pun2TaskCallback.OnConnectedAsync(token);
+    await Pun2TaskCallback.OnCreatedRoomAsync(token);
+    await Pun2TaskCallback.OnJoinedRoomAsync(token);
+    await Pun2TaskCallback.OnLeftRoomAsync(token);
     // etc.
 
     // パラメータの取得も可能
     // You can get the parameters.
-    DisconnectCause disconnectCause = await Pun2TaskCallback.OnDisconnectedAsync();
-    Player newPlayer = await Pun2TaskCallback.OnPlayerEnteredRoomAsync();
-    Player leftPlayer = await Pun2TaskCallback.OnPlayerLeftRoomAsync();
+    DisconnectCause disconnectCause = await Pun2TaskCallback.OnDisconnectedAsync(token);
+    Player newPlayer = await Pun2TaskCallback.OnPlayerEnteredRoomAsync(token);
+    Player leftPlayer = await Pun2TaskCallback.OnPlayerLeftRoomAsync(token);
     // etc.
 
     // OnPlayerEnteredRoom and OnPlayerLeftRoomAsync can be treated as UniTaskAsyncEnumerable.
