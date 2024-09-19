@@ -1,7 +1,7 @@
 {
     "name": "com.torisoup.pun2task",
     "displayName": "Pun2Task",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "unity": "2022.3",
     "description": "Provides async/await support for PUN2 ",
     "license": "MIT",
